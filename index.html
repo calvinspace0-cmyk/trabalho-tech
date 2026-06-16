@@ -4,8 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz Educativo - Sala de Aula</title>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+    <!-- ════════════════════════════════════════════════════
+         ⚠️  CONFIGURAÇÃO DO FIREBASE  ⚠️
+         Siga os passos no "Guia de Configuração" abaixo
+         para preencher estas credenciais com as suas.
+         ════════════════════════════════════════════════════ -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import {
+            getDatabase, ref, set, get, update, onValue, remove, push, child
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+        // ── COLE AQUI AS SUAS CREDENCIAIS DO FIREBASE ──────────────────
+        const firebaseConfig = {
+            apiKey:            "COLE_AQUI",
+            authDomain:        "COLE_AQUI",
+            databaseURL:       "COLE_AQUI",   // ← obrigatório: https://SEU_PROJETO-default-rtdb.firebaseio.com
+            projectId:         "COLE_AQUI",
+            storageBucket:     "COLE_AQUI",
+            messagingSenderId: "COLE_AQUI",
+            appId:             "COLE_AQUI"
+        };
+        // ────────────────────────────────────────────────────────────────
+
+        const app = initializeApp(firebaseConfig);
+        const db  = getDatabase(app);
+
+        // Expõe para o código global (não-modular)
+        window._fb = {
+            db,
+            ref: (path)           => ref(db, path),
+            set: (r, v)           => set(r, v),
+            get: (r)              => get(r),
+            update: (r, v)        => update(r, v),
+            onValue,
+            remove: (r)           => remove(r),
+            push: (r, v)          => push(r, v),
+            child
+        };
+        window._fbReady = true;
+        document.dispatchEvent(new Event("firebase-ready"));
+    </script>
+
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -77,17 +118,17 @@
             margin: 5px;
         }
         .btn:hover { background-color: #45a049; }
-        .btn-admin { background-color: #9c27b0; }
-        .btn-admin:hover { background-color: #7b1fa2; }
+        .btn-admin  { background-color: #9c27b0; }
+        .btn-admin:hover  { background-color: #7b1fa2; }
         .btn-danger { background-color: #f44336; }
         .btn-danger:hover { background-color: #d32f2f; }
         .btn-orange { background-color: #ff9800; }
         .btn-orange:hover { background-color: #f57c00; }
-        .btn-blue { background-color: #2196f3; }
-        .btn-blue:hover { background-color: #1976d2; }
+        .btn-blue   { background-color: #2196f3; }
+        .btn-blue:hover   { background-color: #1976d2; }
         .btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
-        /* LOBBY / LISTA DE JOGADORES */
+        /* LOBBY */
         .players-list {
             background: #f9f9f9;
             border: 1px solid #ddd;
@@ -135,7 +176,7 @@
         }
         #timer-display { color: #ff4757; }
 
-        /* OPÇÕES DE RESPOSTA */
+        /* OPÇÕES */
         .options-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -155,8 +196,8 @@
             text-align: center;
         }
         .option-btn:hover:not(:disabled) { background-color: #0b7dda; transform: translateY(-2px); }
-        .option-btn.correct { background-color: #4caf50 !important; transform: none; }
-        .option-btn.wrong { background-color: #f44336 !important; transform: none; }
+        .option-btn.correct  { background-color: #4caf50 !important; transform: none; }
+        .option-btn.wrong    { background-color: #f44336 !important; transform: none; }
         .option-btn:disabled { cursor: default; }
         .option-btn.selected-answer { background-color: #78909c !important; transform: none; }
 
@@ -180,10 +221,10 @@
         /* PAINEL DO PROFESSOR */
         .admin-panel { text-align: left; }
         .admin-panel h2 { text-align: center; margin-bottom: 8px; }
-        .admin-panel p { text-align: center; color: #666; margin-bottom: 15px; }
+        .admin-panel p  { text-align: center; color: #666; margin-bottom: 15px; }
 
-        .progress-bar-bg { background: #eee; border-radius: 20px; height: 10px; margin: 8px 0; overflow: hidden; }
-        .progress-bar-fill { height: 100%; background: #2196f3; border-radius: 20px; transition: width 0.4s; }
+        .progress-bar-bg  { background: #eee; border-radius: 20px; height: 10px; margin: 8px 0; overflow: hidden; }
+        .progress-bar-fill{ height: 100%; background: #2196f3; border-radius: 20px; transition: width 0.4s; }
 
         .phase-badge {
             display: inline-block;
@@ -211,7 +252,7 @@
         }
 
         .admin-controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 12px; }
-        .answered-info { font-size: 0.9rem; color: #555; margin-top: 6px; }
+        .answered-info  { font-size: 0.9rem; color: #555; margin-top: 6px; }
 
         .admin-option-list { list-style: none; margin: 10px 0; }
         .admin-option-list li {
@@ -242,116 +283,168 @@
         .score-rank { font-size: 1.1rem; padding: 10px 0; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px; }
         .score-rank:last-child { border-bottom: none; }
 
-        .timer-admin { font-size: 2rem; font-weight: bold; color: #f44336; display: inline-block; min-width: 50px; }
+        .timer-admin  { font-size: 2rem; font-weight: bold; color: #f44336; display: inline-block; min-width: 50px; }
         .timer-bar-bg { background: #eee; border-radius: 20px; height: 12px; overflow: hidden; margin: 6px 0 14px; }
         .timer-bar-fill { height: 100%; background: #f44336; border-radius: 20px; transition: width 1s linear; }
 
         .info-box { background: #fff3e0; border: 1px solid #ffb74d; border-radius: 8px; padding: 12px 16px; font-size: 0.9rem; color: #e65100; margin-bottom: 15px; text-align: left; line-height: 1.7; }
 
-        /* ANIMAÇÕES */
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #score-display { color: #4caf50; font-weight: bold; }
 
-        /* ===== TELA DE FIM / PÓDIO / SUSPENSE ===== */
-        #screen-end { text-align: center; }
+        /* LOCK SCREEN RICO */
+        .lock-result-box {
+            margin: 16px auto 0;
+            max-width: 340px;
+            border-radius: 16px;
+            padding: 20px 22px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            animation: popInLock 0.5s cubic-bezier(0.175,0.885,0.32,1.275) forwards;
+        }
+        @keyframes popInLock {
+            from { opacity:0; transform: scale(0.7); }
+            to   { opacity:1; transform: scale(1); }
+        }
+        .lock-result-box.acertou { background: linear-gradient(135deg,#43e97b,#38f9d7); color:#064e1a; border:2px solid #2ecc71; }
+        .lock-result-box.errou   { background: linear-gradient(135deg,#f7971e,#ffd200); color:#5a2d00; border:2px solid #f39c12; }
+        .lock-result-box.tempo   { background: linear-gradient(135deg,#bdc3c7,#95a5a6); color:#2c3e50; border:2px solid #7f8c8d; }
+        .lock-result-emoji { font-size:3rem; display:block; margin-bottom:8px; }
+        .lock-result-msg   { font-size:1rem; font-weight:normal; margin-top:6px; line-height:1.5; }
+        .lock-pts-gained   { font-size:1.4rem; margin-top:8px; display:block; }
+        .lock-ranking-box  { margin-top:14px; background:rgba(255,255,255,0.35); border-radius:10px; padding:10px 16px; font-size:0.95rem; font-weight:bold; }
+        .lock-ranking-pos  { font-size:1.6rem; }
 
-        #confetti-canvas {
-            position: fixed; top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            pointer-events: none; z-index: 9999;
-        }
+        /* BARRA DE % */
+        .pct-bar-wrap { margin:6px 0 2px; }
+        .pct-bar-row  { display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:0.88rem; }
+        .pct-bar-label{ min-width:120px; max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#444; }
+        .pct-bar-bg   { flex:1; background:#e0e0e0; border-radius:20px; height:14px; overflow:hidden; }
+        .pct-bar-fill { height:100%; border-radius:20px; background:#2196f3; transition:width 0.5s ease; }
+        .pct-bar-fill.correct-bar { background:#4caf50; }
+        .pct-num      { min-width:36px; text-align:right; font-weight:bold; color:#333; font-size:0.85rem; }
 
-        .suspense-card {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            animation: popIn 0.6s cubic-bezier(0.175,0.885,0.32,1.275) forwards;
-            margin: 10px 0 20px;
+        /* OVERLAY SUSPENSE 1º */
+        #suspense-overlay {
+            display:none; position:fixed; inset:0; background:#000;
+            z-index:8000; overflow:hidden;
+            flex-direction:column; align-items:center; justify-content:center;
+            text-align:center;
         }
-        .suspense-card.active { display: flex; }
+        #suspense-overlay.ativo { display:flex; }
+        .luz { position:absolute; border-radius:50%; filter:blur(60px); opacity:0; animation:piscarLuz 0.4s infinite alternate; pointer-events:none; }
+        .luz-1 { width:300px; height:300px; background:#ff0040; top:-60px;   left:-60px;   animation-delay:0s; }
+        .luz-2 { width:250px; height:250px; background:#ffd700; top:-40px;   right:-40px;  animation-delay:.15s; }
+        .luz-3 { width:280px; height:280px; background:#00eaff; bottom:-60px; left:20px;   animation-delay:.3s; }
+        .luz-4 { width:260px; height:260px; background:#bf00ff; bottom:-40px; right:-20px; animation-delay:.05s; }
+        .luz-5 { width:200px; height:200px; background:#ff8c00; top:50%; left:50%; transform:translate(-50%,-50%); animation-delay:.2s; }
+        @keyframes piscarLuz { 0%{opacity:0} 100%{opacity:.75} }
 
-        @keyframes popIn {
-            0%   { opacity:0; transform: scale(0.4) translateY(40px); }
-            100% { opacity:1; transform: scale(1) translateY(0); }
-        }
-        @keyframes fadeSlideIn {
-            0%   { opacity:0; transform: translateY(30px); }
-            100% { opacity:1; transform: translateY(0); }
-        }
-        @keyframes shimmer {
-            0%,100% { text-shadow: 0 0 8px #ffd700, 0 0 20px #ffd700; }
-            50%      { text-shadow: 0 0 20px #fff200, 0 0 40px #ffaa00; }
-        }
+        .tambores-wrap { position:relative; z-index:1; display:flex; gap:18px; margin-bottom:20px; }
+        .tambor { font-size:3.5rem; animation:baterTambor 0.3s infinite alternate; display:inline-block; }
+        .tambor:nth-child(2) { animation-delay:.15s; }
+        .tambor:nth-child(3) { animation-delay:.07s; }
+        @keyframes baterTambor { 0%{transform:translateY(0) scale(1)} 100%{transform:translateY(-10px) scale(1.12)} }
 
-        .suspense-medal { font-size: 3.5rem; line-height: 1; }
-        .suspense-avatar { font-size: 5rem; line-height: 1; }
-        .suspense-name {
-            font-size: 1.8rem; font-weight: bold; color: #1a237e;
-            margin: 4px 0;
+        .suspense-titulo { position:relative; z-index:1; font-size:2rem; font-weight:900; color:#fff;
+            text-shadow:0 0 20px #ffd700,0 0 40px #ffd700; letter-spacing:3px;
+            animation:pulseTxt 0.5s infinite alternate; margin-bottom:10px; }
+        @keyframes pulseTxt { 0%{transform:scale(1);text-shadow:0 0 10px #ffd700} 100%{transform:scale(1.06);text-shadow:0 0 40px #fff700,0 0 80px #ff8800} }
+
+        .suspense-reticencias { position:relative; z-index:1; font-size:3rem; color:#ffd700; letter-spacing:8px; animation:fadeReticencias 0.6s infinite alternate; }
+        @keyframes fadeReticencias { 0%{opacity:.2} 100%{opacity:1} }
+
+        #reveal-nome-1 { position:relative; z-index:1; display:none; flex-direction:column; align-items:center; animation:explodeName 0.7s cubic-bezier(0.175,0.885,0.32,1.275) forwards; }
+        #reveal-nome-1.visivel { display:flex; }
+        @keyframes explodeName { 0%{opacity:0;transform:scale(.2)} 60%{transform:scale(1.15)} 100%{opacity:1;transform:scale(1)} }
+
+        .reveal-avatar-big { font-size:7rem; line-height:1; margin-bottom:8px; }
+        .reveal-nome-big   { font-size:2.8rem; font-weight:900; color:#ffd700; text-shadow:0 0 20px #ff8800,0 0 50px #ffd700; letter-spacing:2px; }
+        .reveal-pts-big    { font-size:1.4rem; color:#fff; background:rgba(255,255,255,.15); border-radius:20px; padding:6px 20px; margin-top:8px; }
+        .reveal-parabens   { font-size:1.6rem; font-weight:bold; color:#fff; margin-top:14px; animation:piscarParabens .5s infinite alternate; }
+        @keyframes piscarParabens { 0%{opacity:.6;color:#ffd700} 100%{opacity:1;color:#fff} }
+
+        #btn-fechar-suspense {
+            position:relative; z-index:1; display:none; margin-top:22px;
+            background:linear-gradient(135deg,#ffd700,#ff8800); color:#000; border:none;
+            padding:14px 36px; font-size:1.1rem; border-radius:30px; cursor:pointer;
+            font-weight:900; letter-spacing:1px; box-shadow:0 4px 20px rgba(255,215,0,.5);
+            animation:pulseBtnFechar 1s infinite alternate;
         }
-        .suspense-pts {
-            font-size: 1.2rem; color: #555;
-            background: #f5f5f5; border-radius: 20px;
-            padding: 4px 18px;
-        }
-        .suspense-1st .suspense-name {
-            font-size: 2.2rem; color: #e65100;
-            animation: shimmer 1.5s infinite;
-        }
-        .suspense-1st .suspense-avatar { font-size: 6rem; }
-        .suspense-1st .suspense-medal  { font-size: 4.5rem; }
+        @keyframes pulseBtnFechar { 0%{box-shadow:0 4px 20px rgba(255,215,0,.4)} 100%{box-shadow:0 6px 40px rgba(255,215,0,.9)} }
+
+        @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+        @keyframes spin   { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+
+        /* FIM / PÓDIO */
+        #screen-end { text-align:center; }
+        #confetti-canvas { position:fixed; top:0; left:0; width:100vw; height:100vh; pointer-events:none; z-index:9999; }
+
+        .suspense-card { display:none; flex-direction:column; align-items:center; justify-content:center; gap:10px; animation:popIn .6s cubic-bezier(0.175,0.885,0.32,1.275) forwards; margin:10px 0 20px; }
+        .suspense-card.active { display:flex; }
+        @keyframes popIn      { 0%{opacity:0;transform:scale(.4) translateY(40px)} 100%{opacity:1;transform:scale(1) translateY(0)} }
+        @keyframes fadeSlideIn{ 0%{opacity:0;transform:translateY(30px)} 100%{opacity:1;transform:translateY(0)} }
+        @keyframes shimmer    { 0%,100%{text-shadow:0 0 8px #ffd700,0 0 20px #ffd700} 50%{text-shadow:0 0 20px #fff200,0 0 40px #ffaa00} }
+
+        .suspense-medal { font-size:3.5rem; line-height:1; }
+        .suspense-avatar{ font-size:5rem; line-height:1; }
+        .suspense-name  { font-size:1.8rem; font-weight:bold; color:#1a237e; margin:4px 0; }
+        .suspense-pts   { font-size:1.2rem; color:#555; background:#f5f5f5; border-radius:20px; padding:4px 18px; }
+        .suspense-1st .suspense-name  { font-size:2.2rem; color:#e65100; animation:shimmer 1.5s infinite; }
+        .suspense-1st .suspense-avatar{ font-size:6rem; }
+        .suspense-1st .suspense-medal { font-size:4.5rem; }
 
         .btn-suspense {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white; border: none;
-            padding: 14px 34px; font-size: 1.15rem;
-            border-radius: 30px; cursor: pointer;
-            font-weight: bold; letter-spacing: 1px;
-            box-shadow: 0 4px 18 rgba(102,126,234,0.4);
-            transition: transform 0.15s, box-shadow 0.15s;
-            margin: 8px 4px;
+            background:linear-gradient(135deg,#667eea,#764ba2); color:white; border:none;
+            padding:14px 34px; font-size:1.15rem; border-radius:30px; cursor:pointer;
+            font-weight:bold; letter-spacing:1px; box-shadow:0 4px 18px rgba(102,126,234,.4);
+            transition:transform .15s,box-shadow .15s; margin:8px 4px;
         }
-        .btn-suspense:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(102,126,234,0.5); }
-        .btn-suspense:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+        .btn-suspense:hover    { transform:translateY(-2px); box-shadow:0 6px 24px rgba(102,126,234,.5); }
+        .btn-suspense:disabled { opacity:.4; cursor:not-allowed; transform:none; }
 
-        #full-table { display: none; margin-top: 20px; animation: fadeSlideIn 0.5s ease forwards; }
-        .table-row {
-            display: flex; align-items: center; gap: 12px;
-            padding: 10px 14px; border-radius: 10px;
-            margin-bottom: 8px; background: #f9f9f9;
-            border: 1px solid #eee; text-align: left;
-        }
-        .table-row.gold   { background: #fff8e1; border-color: #ffd54f; }
-        .table-row.silver { background: #f5f5f5; border-color: #bdbdbd; }
-        .table-row.bronze { background: #fbe9e7; border-color: #ffab91; }
-        .table-pos  { font-size: 1.2rem; font-weight: bold; min-width: 32px; }
-        .table-av   { font-size: 1.8rem; }
-        .table-name { flex: 1; font-size: 1rem; font-weight: bold; color: #222; }
-        .table-pts  { font-size: 0.95rem; color: #555; white-space: nowrap; }
+        #full-table { display:none; margin-top:20px; animation:fadeSlideIn .5s ease forwards; }
+        .table-row { display:flex; align-items:center; gap:12px; padding:10px 14px; border-radius:10px; margin-bottom:8px; background:#f9f9f9; border:1px solid #eee; text-align:left; }
+        .table-row.gold   { background:#fff8e1; border-color:#ffd54f; }
+        .table-row.silver { background:#f5f5f5; border-color:#bdbdbd; }
+        .table-row.bronze { background:#fbe9e7; border-color:#ffab91; }
+        .table-pos  { font-size:1.2rem; font-weight:bold; min-width:32px; }
+        .table-av   { font-size:1.8rem; }
+        .table-name { flex:1; font-size:1rem; font-weight:bold; color:#222; }
+        .table-pts  { font-size:.95rem; color:#555; white-space:nowrap; }
 
-        .parabens-box {
-            background: linear-gradient(135deg, #ff9a9e, #fad0c4, #ffecd2);
-            border-radius: 16px; padding: 18px 20px; margin: 16px 0;
-            font-size: 1.4rem; font-weight: bold; color: #bf360c;
-            animation: popIn 0.7s ease forwards;
-        }
+        .parabens-box { background:linear-gradient(135deg,#ff9a9e,#fad0c4,#ffecd2); border-radius:16px; padding:18px 20px; margin:16px 0; font-size:1.4rem; font-weight:bold; color:#bf360c; animation:popIn .7s ease forwards; }
+        .phase-title  { font-size:1.05rem; color:#888; margin:14px 0 6px; text-transform:uppercase; letter-spacing:1px; }
+        .dots-anim    { font-size:2rem; animation:pulse 1s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
 
-        .phase-title {
-            font-size: 1.05rem; color: #888; margin: 14px 0 6px;
-            text-transform: uppercase; letter-spacing: 1px;
-        }
-        .dots-anim { font-size: 2rem; animation: pulse 1s infinite; }
-        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+        /* GUIA SETUP — sempre oculto na tela */
+        #setup-guide { display:none !important; }
+        .setup-ok    { display:none !important; }
     </style>
 </head>
 <body>
 <div class="game-container">
 
+    <!-- ===== GUIA DE CONFIGURAÇÃO (some após conectar) ===== -->
+    <div id="setup-guide">
+        <h3>⚙️ Guia de Configuração do Firebase (único passo necessário)</h3>
+        <ol>
+            <li>Acesse <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a> e faça login com sua conta Google.</li>
+            <li>Clique em <b>"Criar um projeto"</b>, dê um nome (ex: <code>quiz-sala</code>) e conclua.</li>
+            <li>No menu lateral, clique em <b>"Realtime Database"</b> → <b>"Criar banco de dados"</b>.<br>
+                Escolha qualquer região → selecione <b>"Iniciar no modo de teste"</b> → Ativar.</li>
+            <li>No menu lateral, vá em <b>"Configurações do projeto"</b> (ícone ⚙️) → aba <b>"Geral"</b>.<br>
+                Em "Seus aplicativos", clique em <b>"&lt;/&gt;"</b> (Web), registre um nome e copie o objeto <code>firebaseConfig</code>.</li>
+            <li>Abra este arquivo HTML num editor de texto, localize o bloco <code>const firebaseConfig = {</code> e substitua cada <code>"COLE_AQUI"</code> pelo valor correspondente.</li>
+            <li>Salve e abra o arquivo no navegador — a mensagem abaixo vai sumir e o jogo vai funcionar em qualquer dispositivo!</li>
+        </ol>
+    </div>
+    <div class="setup-ok" id="setup-ok">✅ Firebase conectado! O jogo está pronto para usar em qualquer dispositivo da mesma rede (ou internet).</div>
+
+    <!-- ===== TELA: LOGIN ALUNO ===== -->
     <div id="screen-login">
         <h2>🎮 Bem-vindo ao Jogo!</h2>
-        <p style="color:#666; margin: 8px 0 16px;">Escolha seu Avatar:</p>
+        <p style="color:#666; margin:8px 0 16px;">Escolha seu Avatar:</p>
         <div class="avatar-grid">
             <span class="avatar-option selected" onclick="selectAvatar(this,'🦊')">🦊</span>
             <span class="avatar-option" onclick="selectAvatar(this,'🐵')">🐵</span>
@@ -372,6 +465,7 @@
         <button class="btn btn-admin" onclick="openAdminAuth()">🎓 Painel do Professor</button>
     </div>
 
+    <!-- ===== TELA: LOBBY ALUNO ===== -->
     <div id="screen-lobby" class="hidden">
         <h2>⏳ Aguardando o Professor...</h2>
         <p style="color:#666;">Você entrou na sala! Aguarde o professor iniciar o jogo.</p>
@@ -383,7 +477,11 @@
         <div class="players-list" id="lobby-players-list"></div>
     </div>
 
+    <!-- ===== TELA: PAINEL DO PROFESSOR ===== -->
     <div id="screen-admin" class="hidden admin-panel">
+        <header style="justify-content:flex-end; margin-bottom:0;">
+            <button id="btn-mute-admin" onclick="toggleMuteAdmin()" style="background:none;border:1px solid #ddd;border-radius:8px;padding:4px 10px;cursor:pointer;font-size:.9rem;">🔊 Som on</button>
+        </header>
         <h2>🎓 Painel do Professor</h2>
         <p>Controle o quiz manualmente — você decide quando revelar a resposta e avançar.</p>
 
@@ -404,9 +502,9 @@
 
         <div id="admin-game-view" class="hidden">
             <div class="nav-tabs">
-                <button class="nav-tab active" onclick="adminTab('tab-q', this)">📋 Questão</button>
-                <button class="nav-tab" onclick="adminTab('tab-score', this)">🏆 Placar</button>
-                <button class="nav-tab" onclick="adminTab('tab-players', this)">👥 Alunos</button>
+                <button class="nav-tab active" onclick="adminTab('tab-q',this)">📋 Questão</button>
+                <button class="nav-tab" onclick="adminTab('tab-score',this)">🏆 Placar</button>
+                <button class="nav-tab" onclick="adminTab('tab-players',this)">👥 Alunos</button>
             </div>
 
             <div id="tab-q">
@@ -415,21 +513,15 @@
                     <div class="progress-bar-bg"><div class="progress-bar-fill" id="admin-progress" style="width:4%"></div></div>
                     <small style="color:#888;" id="admin-phase-label">Fase 1 de 25</small>
                 </div>
-
                 <div style="margin-bottom:12px;">
-                    <span class="timer-admin" id="admin-timer">30</span>
-                    <span style="color:#888; font-size:0.85rem;">s restantes</span>
+                    <span class="timer-admin" id="admin-timer">60</span>
+                    <span style="color:#888; font-size:.85rem;">s restantes</span>
                     <div class="timer-bar-bg"><div class="timer-bar-fill" id="admin-timer-bar" style="width:100%"></div></div>
                 </div>
-
                 <h3 id="admin-question-text" style="font-size:1.1rem; margin-bottom:14px; text-align:left;"></h3>
-
                 <ul class="admin-option-list" id="admin-options-list"></ul>
-
                 <div id="admin-answer-box" class="answer-reveal-box hidden">✅ Resposta correta: <span id="admin-answer-text"></span></div>
-
                 <div class="answered-info" id="admin-answered-info"></div>
-
                 <div class="admin-controls">
                     <button class="btn btn-blue" id="btn-reveal-admin" onclick="adminRevealAnswer()">👁️ Revelar Resposta</button>
                     <button class="btn" id="btn-next-admin" onclick="adminNextPhase()" style="display:none;">▶️ Próxima Fase</button>
@@ -447,11 +539,12 @@
         </div>
     </div>
 
+    <!-- ===== TELA: JOGO (ALUNO) ===== -->
     <div id="screen-game" class="hidden">
         <header>
             <div>Fase: <span id="current-phase">1</span>/25</div>
-            <div id="timer-display">⏱️ <span id="time-left">30</span>s</div>
-            <button id="btn-mute" onclick="toggleMute()" style="background:none;border:1px solid #ddd;border-radius:8px;padding:4px 10px;cursor:pointer;font-size:0.9rem;">🔊 Som on</button>
+            <div id="timer-display">⏱️ <span id="time-left">60</span>s</div>
+            <div id="score-display">⭐ <span id="my-score-display">0</span> pts</div>
         </header>
         <div class="mascot-container">
             <div class="mascot" id="mascot">🐺</div>
@@ -461,9 +554,9 @@
         <div class="options-grid" id="options-container"></div>
     </div>
 
+    <!-- ===== TELA: FIM DE JOGO ===== -->
     <div id="screen-end" class="hidden">
         <canvas id="confetti-canvas"></canvas>
-
         <h2 style="font-size:1.6rem; margin-bottom:4px;">🏆 Resultado Final!</h2>
         <p style="color:#888; margin-bottom:16px;">O professor vai revelar o pódio...</p>
 
@@ -474,8 +567,8 @@
         <div id="card-3" class="suspense-card">
             <div class="suspense-medal">🥉</div>
             <div class="suspense-avatar" id="av-3"></div>
-            <div class="suspense-name" id="nm-3"></div>
-            <div class="suspense-pts" id="pt-3"></div>
+            <div class="suspense-name"   id="nm-3"></div>
+            <div class="suspense-pts"    id="pt-3"></div>
         </div>
 
         <div id="step-2" style="display:none;">
@@ -485,8 +578,8 @@
         <div id="card-2" class="suspense-card">
             <div class="suspense-medal">🥈</div>
             <div class="suspense-avatar" id="av-2"></div>
-            <div class="suspense-name" id="nm-2"></div>
-            <div class="suspense-pts" id="pt-2"></div>
+            <div class="suspense-name"   id="nm-2"></div>
+            <div class="suspense-pts"    id="pt-2"></div>
         </div>
 
         <div id="step-1" style="display:none;">
@@ -496,8 +589,8 @@
         <div id="card-1" class="suspense-card suspense-1st">
             <div class="suspense-medal">🥇</div>
             <div class="suspense-avatar" id="av-1"></div>
-            <div class="suspense-name" id="nm-1"></div>
-            <div class="suspense-pts" id="pt-1"></div>
+            <div class="suspense-name"   id="nm-1"></div>
+            <div class="suspense-pts"    id="pt-1"></div>
             <div class="parabens-box" id="parabens-box" style="display:none;">
                 🎉 Parabéns, <span id="parabens-nome"></span>! 🎉<br>
                 <span style="font-size:1rem; font-weight:normal;">Você foi o campeão do quiz!</span>
@@ -508,7 +601,7 @@
             <button class="btn-suspense" id="btn-show3" onclick="showPodio(3)">🥉 Revelar 3º lugar</button>
             <button class="btn-suspense" id="btn-show2" onclick="showPodio(2)" disabled style="display:none;">🥈 Revelar 2º lugar</button>
             <button class="btn-suspense" id="btn-show1" onclick="showPodio(1)" disabled style="display:none;">🥇 Revelar 1º lugar</button>
-            <button class="btn-suspense" id="btn-showall" onclick="showFullTable()" style="display:none; background: linear-gradient(135deg,#43cea2,#185a9d);">📋 Ver tabela completa</button>
+            <button class="btn-suspense" id="btn-showall" onclick="showFullTable()" style="display:none; background:linear-gradient(135deg,#43cea2,#185a9d);">📋 Ver tabela completa</button>
         </div>
 
         <div id="full-table">
@@ -519,75 +612,131 @@
     </div>
 </div>
 
+<!-- OVERLAY SUSPENSE 1º -->
+<div id="suspense-overlay">
+    <div class="luz luz-1"></div><div class="luz luz-2"></div>
+    <div class="luz luz-3"></div><div class="luz luz-4"></div><div class="luz luz-5"></div>
+    <div id="suspense-fase-1">
+        <div class="tambores-wrap">
+            <span class="tambor">🥁</span><span class="tambor">🥁</span><span class="tambor">🥁</span>
+        </div>
+        <div class="suspense-titulo">E O CAMPEÃO É...</div>
+        <div class="suspense-reticencias">● ● ●</div>
+    </div>
+    <div id="reveal-nome-1">
+        <div class="reveal-avatar-big" id="reveal-av-big"></div>
+        <div class="reveal-nome-big"   id="reveal-nm-big"></div>
+        <div class="reveal-pts-big"    id="reveal-pt-big"></div>
+        <div class="reveal-parabens">🎉 PARABÉNS! 🎉</div>
+    </div>
+    <button id="btn-fechar-suspense" onclick="fecharSuspense()">🏆 Ver Classificação</button>
+</div>
+
+<!-- TELA TRAVADA -->
 <div id="screen-locked" class="lock-screen hidden">
-    <div class="spinner">⏳</div>
-    <h2>Resposta Enviada!</h2>
-    <p style="margin-top:10px; max-width:320px;">Aguarde o professor revelar a resposta e avançar para a próxima fase.</p>
-    <p id="lock-status-text" style="margin-top:8px; color:#aaa; font-size:0.9remParent;"></p>
+    <div class="spinner" id="lock-spinner">⏳</div>
+    <h2 id="lock-title">Resposta Enviada!</h2>
+    <p style="margin-top:8px; max-width:320px; color:#ccc; font-size:.95rem;" id="lock-subtitle">Aguarde o professor revelar a resposta...</p>
+    <div id="lock-result-area"></div>
 </div>
 
 <script>
-// ATENÇÃO: COLE SUA CONFIGURAÇÃO DO FIREBASE LOGO ABAIXO:
-// ==========================================
-const firebaseConfig = {
-    apiKey: "SUA_API_KEY",
-    authDomain: "SEU_PROJECT_ID.firebaseapp.com",
-    databaseURL: "https://SEU_PROJECT_ID-default-rtdb.firebaseio.com",
-    projectId: "SEU_PROJECT_ID",
-    storageBucket: "SEU_PROJECT_ID.appspot.com",
-    messagingSenderId: "SEU_SENDER_ID",
-    appId: "SUA_APP_ID"
-};
-// ==========================================
-
-// Inicializa o Firebase
-firebase.initializeApp(firebaseConfig);
-const database = firebase.database();
-
+// ═══════════════════════════════════════════════════════════════
+//  BANCO DE PERGUNTAS
+// ═══════════════════════════════════════════════════════════════
 const questions = [
-    { phase:1,  subject:"Matemática", question:"Quanto é 7 × 8?",                                              options:["54","56","62","48"],                                           answer:"56" },
-    { phase:2,  subject:"Português",  question:"Qual das palavras abaixo é um substantivo?",                   options:["Correr","Bonito","Cachorro","Devagar"],                         answer:"Cachorro" },
-    { phase:3,  subject:"Ciências",   question:"Qual planeta é conhecido como o Planeta Vermelho?",            options:["Terra","Júpiter","Marte","Saturno"],                            answer:"Marte" },
-    { phase:4,  subject:"História",   question:"Quem descobriu o Brasil em 1500?",                             options:["Dom Pedro I","Pedro Álvares Cabral","Tiradentes","Colombo"],    answer:"Pedro Álvares Cabral" },
-    { phase:5,  subject:"Geografia",  question:"Qual é a capital do Brasil?",                                  options:["São Paulo","Rio de Janeiro","Brasília","Salvador"],             answer:"Brasília" },
-    { phase:6,  subject:"Matemática", question:"Se uma caixa tem 12 ovos, quantos têm em 3 caixas?",          options:["24","30","36","42"],                                            answer:"36" },
-    { phase:7,  subject:"Português",  question:"Qual o antônimo de 'Rápido'?",                                 options:["Veloz","Lento","Alto","Forte"],                                answer:"Lento" },
-    { phase:8,  subject:"Ciências",   question:"Qual o estado físico da água quando ela vira gelo?",           options:["Líquido","Gasoso","Sólido","Plasma"],                           answer:"Sólido" },
-    { phase:9,  subject:"Geografia",  question:"Em qual continent fica o Brasil?",                            options:["Europa","África","Ásia","América do Sul"],                     answer:"América do Sul" },
-    { phase:10, subject:"História",   question:"O que comemoramos no dia 7 de Setembro?",                      options:["República","Dia do Trabalho","Independência do Brasil","Natal"],answer:"Independência do Brasil" },
-    { phase:11, subject:"Matemática", question:"Qual o resultado de 150 + 250?",                               options:["350","400","450","500"],                                        answer:"400" },
-    { phase:12, subject:"Português",  question:"Qual dessas palavras está grafada corretamente?",              options:["Caza","Chave","Xave","Asa"],                                    answer:"Chave" },
-    { phase:13, subject:"Ciências",   question:"Qual é o gás que nós respiramos para sobreviver?",             options:["Gás Carbônico","Oxigênio","Nitrogênio","Hélio"],                answer:"Oxigênio" },
-    { phase:14, subject:"História",   question:"Quem proclamou a Independência do Brasil?",                    options:["Dom Pedro I","Zumbi","Deodoro da Fonseca","Dom Pedro II"],      answer:"Dom Pedro I" },
-    { phase:15, subject:"Geografia",  question:"Qual é o maior oceano do planeta Terra?",                      options:["Atlântico","Índico","Pacífico","Ártico"],                       answer:"Pacífico" },
-    { phase:16, subject:"Matemática", question:"Quanto é metade de 100?",                                      options:["25","40","50","60"],                                            answer:"50" },
-    { phase:17, subject:"Português",  question:"Quantas sílabas tem a palavra 'Borboleta'?",                   options:["2","3","4","5"],                                               answer:"4" },
-    { phase:18, subject:"Ciências",   question:"Qual estrela ilumina e aquece a Terra?",                       options:["Lua","Sol","Estrela D'Alva","Marte"],                           answer:"Sol" },
-    { phase:19, subject:"História",   question:"Quem já vivia no Brasil antes de 1500?",                       options:["Indígenas","Incas","Astecas","Romanos"],                        answer:"Indígenas" },
-    { phase:20, subject:"Geografia",  question:"Qual o maior rio em volume de água no Brasil?",                options:["São Francisco","Paraná","Amazonas","Nilo"],                     answer:"Amazonas" },
-    { phase:21, subject:"Matemática", question:"Quantos lados tem um pentágono?",                              options:["4","5","6","8"],                                               answer:"5" },
-    { phase:22, subject:"Português",  question:"A palavra 'Felicidade' é um:",                                 options:["Verbo","Adjetivo","Substantivo","Pronome"],                     answer:"Substantivo" },
-    { phase:23, subject:"Ciências",   question:"Qual animal abaixo é considerado um mamífero?",                options:["Tubarão","Baleia","Jacaré","Águia"],                            answer:"Baleia" },
-    { phase:24, subject:"História",   question:"As pirâmides antigas ficam em qual país?",                     options:["Grécia","Itália","Egito","México"],                             answer:"Egito" },
-    { phase:25, subject:"Geografia",  question:"Qual linha divide a Terra em Hemisfério Norte e Sul?",         options:["Equador","Capricórnio","Greenwich","Câncer"],                   answer:"Equador" }
+    { phase:1,  subject:"Matemática", question:"Quanto é 7 × 8?",                                              options:["54","56","62","48"],                                            answer:"56" },
+    { phase:2,  subject:"Português",  question:"Qual das palavras abaixo é um substantivo?",                   options:["Correr","Bonito","Cachorro","Devagar"],                          answer:"Cachorro" },
+    { phase:3,  subject:"Ciências",   question:"Qual planeta é conhecido como o Planeta Vermelho?",            options:["Terra","Júpiter","Marte","Saturno"],                             answer:"Marte" },
+    { phase:4,  subject:"História",   question:"Quem descobriu o Brasil em 1500?",                             options:["Dom Pedro I","Pedro Álvares Cabral","Tiradentes","Colombo"],     answer:"Pedro Álvares Cabral" },
+    { phase:5,  subject:"Geografia",  question:"Qual é a capital do Brasil?",                                  options:["São Paulo","Rio de Janeiro","Brasília","Salvador"],              answer:"Brasília" },
+    { phase:6,  subject:"Matemática", question:"Se uma caixa tem 12 ovos, quantos têm em 3 caixas?",          options:["24","30","36","42"],                                             answer:"36" },
+    { phase:7,  subject:"Português",  question:"Qual o antônimo de 'Rápido'?",                                 options:["Veloz","Lento","Alto","Forte"],                                 answer:"Lento" },
+    { phase:8,  subject:"Ciências",   question:"Qual o estado físico da água quando ela vira gelo?",           options:["Líquido","Gasoso","Sólido","Plasma"],                            answer:"Sólido" },
+    { phase:9,  subject:"Geografia",  question:"Em qual continente fica o Brasil?",                            options:["Europa","África","Ásia","América do Sul"],                      answer:"América do Sul" },
+    { phase:10, subject:"História",   question:"O que comemoramos no dia 7 de Setembro?",                      options:["República","Dia do Trabalho","Independência do Brasil","Natal"], answer:"Independência do Brasil" },
+    { phase:11, subject:"Matemática", question:"Qual o resultado de 150 + 250?",                               options:["350","400","450","500"],                                         answer:"400" },
+    { phase:12, subject:"Português",  question:"Qual dessas palavras está grafada corretamente?",              options:["Caza","Chave","Xave","Asa"],                                     answer:"Chave" },
+    { phase:13, subject:"Ciências",   question:"Qual é o gás que nós respiramos para sobreviver?",             options:["Gás Carbônico","Oxigênio","Nitrogênio","Hélio"],                 answer:"Oxigênio" },
+    { phase:14, subject:"História",   question:"Quem proclamou a Independência do Brasil?",                    options:["Dom Pedro I","Zumbi","Deodoro da Fonseca","Dom Pedro II"],       answer:"Dom Pedro I" },
+    { phase:15, subject:"Geografia",  question:"Qual é o maior oceano do planeta Terra?",                      options:["Atlântico","Índico","Pacífico","Ártico"],                        answer:"Pacífico" },
+    { phase:16, subject:"Matemática", question:"Quanto é metade de 100?",                                      options:["25","40","50","60"],                                             answer:"50" },
+    { phase:17, subject:"Português",  question:"Quantas sílabas tem a palavra 'Borboleta'?",                   options:["2","3","4","5"],                                                answer:"4" },
+    { phase:18, subject:"Ciências",   question:"Qual estrela ilumina e aquece a Terra?",                       options:["Lua","Sol","Estrela D'Alva","Marte"],                            answer:"Sol" },
+    { phase:19, subject:"História",   question:"Quem já vivia no Brasil antes de 1500?",                       options:["Indígenas","Incas","Astecas","Romanos"],                         answer:"Indígenas" },
+    { phase:20, subject:"Geografia",  question:"Qual o maior rio em volume de água no Brasil?",                options:["São Francisco","Paraná","Amazonas","Nilo"],                      answer:"Amazonas" },
+    { phase:21, subject:"Matemática", question:"Quantos lados tem um pentágono?",                              options:["4","5","6","8"],                                                answer:"5" },
+    { phase:22, subject:"Português",  question:"A palavra 'Felicidade' é um:",                                 options:["Verbo","Adjetivo","Substantivo","Pronome"],                      answer:"Substantivo" },
+    { phase:23, subject:"Ciências",   question:"Qual animal abaixo é considerado um mamífero?",                options:["Tubarão","Baleia","Jacaré","Águia"],                             answer:"Baleia" },
+    { phase:24, subject:"História",   question:"As pirâmides antigas ficam em qual país?",                     options:["Grécia","Itália","Egito","México"],                              answer:"Egito" },
+    { phase:25, subject:"Geografia",  question:"Qual linha divide a Terra em Hemisfério Norte e Sul?",         options:["Equador","Capricórnio","Greenwich","Câncer"],                    answer:"Equador" }
 ];
 
 const subjectBadgeClass = {
     "Matemática":"badge-mat","Português":"badge-por","Ciências":"badge-cie","História":"badge-his","Geografia":"badge-geo"
 };
 
-let myId = sessionStorage.getItem("quiz_my_id") || "player_" + Math.random().toString(36).substring(2,9);
+// ═══════════════════════════════════════════════════════════════
+//  ESTADO LOCAL
+// ═══════════════════════════════════════════════════════════════
+let myId     = sessionStorage.getItem("quiz_my_id") || "player_" + Math.random().toString(36).substring(2,9);
 sessionStorage.setItem("quiz_my_id", myId);
 
-let myName = "", myAvatar = "🦊", isAdmin = false, gameActive = false;
-let currentQuestionIndex = -1, myScore = 0, timeLeft = 30;
-let timerInterval;
-let adminTimerInterval, adminTimerVal = 30;
+let myName = "", myAvatar = "🦊", isAdmin = false;
+let currentQuestionIndex = -1, myScore = 0, timeLeft = 60;
+let myLastSelected = "", myLastCorrect = "", myLastPoints = 0;
+let timerInterval, adminTimerInterval, adminTimerVal = 60;
+let _resultadoMostrado = false;
+let _unsubRoom = null, _unsubPlayers = null;
+let _podioSorted = [];
+let _muteAdminVoz = false;
+let _fbReady = false;
 
+// ═══════════════════════════════════════════════════════════════
+//  AGUARDA FIREBASE ESTAR PRONTO
+// ═══════════════════════════════════════════════════════════════
+document.addEventListener("firebase-ready", () => {
+    _fbReady = true;
+    document.getElementById("setup-guide").style.display = "none";
+    document.getElementById("setup-ok").style.display    = "block";
+    initVoice();
+    checkActiveSession();
+});
+
+// Fallback: se demorar 4s sem conectar, mantém guia visível
+setTimeout(() => {
+    if (!_fbReady) {
+        document.getElementById("setup-guide").style.display = "block";
+    }
+}, 4000);
+
+// ═══════════════════════════════════════════════════════════════
+//  HELPERS FIREBASE
+// ═══════════════════════════════════════════════════════════════
+function fbRef(path)        { return window._fb.ref(path); }
+function fbSet(path, val)   { return window._fb.set(fbRef(path), val); }
+function fbGet(path)        { return window._fb.get(fbRef(path)); }
+function fbUpdate(path, val){ return window._fb.update(fbRef(path), val); }
+function fbRemove(path)     { return window._fb.remove(fbRef(path)); }
+function fbListen(path, cb) {
+    const r = fbRef(path);
+    window._fb.onValue(r, snap => cb(snap.val()));
+    return () => window._fb.onValue(r, () => {}, { onlyOnce: false });
+}
+
+// Atalho: pega jogadores
+async function getPlayers() {
+    const snap = await fbGet("quiz/players");
+    return snap.val() || {};
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  TELAS
+// ═══════════════════════════════════════════════════════════════
 function showScreen(id) {
-    ["screen-login","screen-lobby","screen-admin","screen-game","screen-end"].forEach(s => {
-        document.getElementById(s).classList.add("hidden");
-    });
+    ["screen-login","screen-lobby","screen-admin","screen-game","screen-end"].forEach(s =>
+        document.getElementById(s).classList.add("hidden")
+    );
     document.getElementById(id).classList.remove("hidden");
 }
 
@@ -597,128 +746,106 @@ function selectAvatar(el, av) {
     myAvatar = av;
 }
 
-// Escuta em tempo real as mudanças globais vinda dos outros computadores
-function listenToDatabase() {
-    // Sincroniza estado da sala e fase atual
-    database.ref("room").on("value", snapshot => {
-        const data = snapshot.val() || { state: "idle", currentIndex: 0, allAnswered: "0" };
-        const roomState = data.state;
-        const serverIdx = parseInt(data.currentIndex || 0);
-
-        if (!isAdmin) {
-            if (roomState === "playing") {
-                if (!gameActive || serverIdx !== currentQuestionIndex) {
-                    gameActive = true;
-                    document.getElementById("screen-locked").classList.add("hidden");
-                    loadPhase(serverIdx);
-                }
-                if (data.allAnswered === "1") {
-                    clearInterval(timerInterval);
-                }
-            }
-            if (roomState === "finished") {
-                removeAntiCheat();
-                showScreen("screen-end");
-                database.ref("players").once("value", snap => {
-                    const players = snap.val() || {};
-                    initPodio(players);
-                    document.getElementById("podio-controls").style.display = "none";
-                    showFullTable();
-                });
-            }
-        }
-    });
-
-    // Sincroniza lista de jogadores em tempo real na interface do lobby/admin
-    database.ref("players").on("value", snapshot => {
-        const players = snapshot.val() || {};
-        
-        let listHtml = Object.values(players).map(p =>
-            `<div class="player-item">${p.avatar} <b>${p.name}</b> — ${p.score || 0} pts ${p.answered ? "✅" : "⏳"}</div>`
-        ).join("");
-        
-        let lobbyEl = document.getElementById("lobby-players-list");
-        if (lobbyEl) lobbyEl.innerHTML = listHtml || "<p style='color:#aaa'>Ninguém ainda...</p>";
-
-        let adminListHtml = Object.values(players).map(p =>
-            `<div class="player-item">${p.avatar} <b>${p.name}</b> — Fase ${(p.currentPhase || 0)+1} — ${p.score || 0} pts ${p.answered?"✅":"⏳"}</div>`
-        ).join("") || "<p style='color:#aaa'>Nenhum aluno ainda...</p>";
-
-        let lobbyList = document.getElementById("admin-players-list-lobby");
-        if (lobbyList) lobbyList.innerHTML = adminListHtml;
-
-        let gameList = document.getElementById("admin-players-list-game");
-        if (gameList) gameList.innerHTML = adminListHtml;
-
-        let total = Object.keys(players).length;
-        let answered = Object.values(players).filter(p => p.answered).length;
-        let infoEl = document.getElementById("admin-answered-info");
-        if (infoEl) infoEl.innerText = total > 0 ? answered + " de " + total + " alunos responderam" : "";
-
-        if (isAdmin) {
-            database.ref("room/state").once("value", stateSnap => {
-                if (stateSnap.val() === "playing" && total > 0 && answered === total) {
-                    database.ref("room/allAnswered").set("1");
-                    clearInterval(adminTimerInterval);
-                }
-            });
-            buildScoreboard(players, "admin-scoreboard");
-        }
-    });
+// ═══════════════════════════════════════════════════════════════
+//  ANTI-CHEAT (bloqueio de navegação)
+// ═══════════════════════════════════════════════════════════════
+function blockNavKeys(e) {
+    if (e.key === "F5") { e.preventDefault(); e.stopImmediatePropagation(); return false; }
+    if ((e.ctrlKey||e.metaKey) && (e.key==="r"||e.key==="R")) { e.preventDefault(); e.stopImmediatePropagation(); return false; }
+    if (e.key === "Backspace" && e.target.tagName!=="INPUT" && e.target.tagName!=="TEXTAREA" && !e.target.isContentEditable) { e.preventDefault(); e.stopImmediatePropagation(); return false; }
+    if (e.altKey && (e.key==="ArrowLeft"||e.key==="ArrowRight")) { e.preventDefault(); e.stopImmediatePropagation(); return false; }
 }
 
-function enterLobby() {
+function blindHistory() {
+    for (let i = 0; i < 50; i++) window.history.pushState({ blocked:true }, "", window.location.href);
+}
+
+(function initGlobalBlock() {
+    document.addEventListener("keydown", blockNavKeys, true);
+    window.addEventListener("beforeunload", e => { e.preventDefault(); e.returnValue = ""; return ""; });
+    blindHistory();
+    window.addEventListener("popstate", blindHistory);
+    setInterval(() => { if (window.history.length < 10) blindHistory(); }, 3000);
+})();
+
+// ═══════════════════════════════════════════════════════════════
+//  ENTRAR NA SALA (ALUNO)
+// ═══════════════════════════════════════════════════════════════
+async function enterLobby() {
+    if (!_fbReady) { alert("Aguarde o Firebase carregar..."); return; }
     let name = document.getElementById("player-name").value.trim();
     if (!name) { alert("Por favor, digite seu nome!"); return; }
     myName = name;
-    
-    // Envia dados do jogador para a nuvem
-    database.ref("players/" + myId).set({
-        name: myName,
-        avatar: myAvatar,
-        score: 0,
-        currentPhase: 0,
-        answered: false
+
+    await fbSet("quiz/players/" + myId, {
+        name: myName, avatar: myAvatar,
+        score: 0, currentPhase: 0, answered: false
     });
 
-    setupAntiCheat();
     showScreen("screen-lobby");
-    listenToDatabase();
+    startStudentSync();
 }
 
-function setupAntiCheat() {
-    window.history.pushState(null, null, window.location.href);
-    window.onpopstate = () => { window.history.pushState(null, null, window.location.href); };
-    window.onbeforeunload = (e) => { e.preventDefault(); e.returnValue = ""; return ""; };
-    document.addEventListener("keydown", blockNavKeys, true);
+// ═══════════════════════════════════════════════════════════════
+//  SYNC ALUNO — escuta Firebase em tempo real
+// ═══════════════════════════════════════════════════════════════
+function startStudentSync() {
+    // Lista de colegas na sala
+    window._fb.onValue(fbRef("quiz/players"), snap => {
+        let players = snap.val() || {};
+        let html = Object.values(players).map(p =>
+            `<div class="player-item">${p.avatar} <b>${p.name}</b> — ${p.score} pts ${p.answered?"✅":"⏳"}</div>`
+        ).join("") || "<p style='color:#aaa'>Ninguém ainda...</p>";
+        let el = document.getElementById("lobby-players-list");
+        if (el) el.innerHTML = html;
+    });
+
+    // Estado da sala
+    window._fb.onValue(fbRef("quiz/room"), snap => {
+        let room = snap.val() || {};
+        let state = room.state || "idle";
+        let serverIdx = room.currentIndex ?? 0;
+
+        if (state === "playing") {
+            // Nova fase
+            if (serverIdx !== currentQuestionIndex) {
+                _resultadoMostrado = false;
+                document.getElementById("screen-locked").classList.add("hidden");
+                loadPhase(serverIdx);
+            }
+            // Professor revelou a resposta?
+            if (room.revealed === serverIdx && !_resultadoMostrado) {
+                _resultadoMostrado = true;
+                getPlayers().then(p => mostrarResultadoAluno(p, serverIdx));
+            }
+        }
+
+        if (state === "finished") {
+            showScreen("screen-end");
+            getPlayers().then(p => {
+                initPodio(p);
+                document.getElementById("podio-controls").style.display = "none";
+                showFullTable();
+            });
+        }
+    });
 }
 
-function blockNavKeys(e) {
-    if (e.key === "F5") { e.preventDefault(); e.stopPropagation(); return false; }
-    if ((e.ctrlKey || e.metaKey) && (e.key === "r" || e.key === "R")) { e.preventDefault(); e.stopPropagation(); return false; }
-    if (e.key === "Backspace" && e.target.tagName !== "INPUT" && e.target.tagName !== "TEXTAREA") { e.preventDefault(); e.stopPropagation(); return false; }
-    if (e.altKey && (e.key === "ArrowLeft" || e.key === "ArrowRight")) { e.preventDefault(); e.stopPropagation(); return false; }
-}
-
-function removeAntiCheat() {
-    window.onbeforeunload = null;
-    window.onpopstate = null;
-    document.removeEventListener("keydown", blockNavKeys, true);
-}
-
+// ═══════════════════════════════════════════════════════════════
+//  CARREGAR FASE (ALUNO)
+// ═══════════════════════════════════════════════════════════════
 function loadPhase(idx) {
     currentQuestionIndex = idx;
     if (idx >= questions.length) return;
     showScreen("screen-game");
 
-    database.ref("players/" + myId).update({
-        answered: false,
-        currentPhase: idx
-    });
+    fbUpdate("quiz/players/" + myId, { answered: false, currentPhase: idx });
 
     clearInterval(timerInterval);
-    timeLeft = 30;
+    timeLeft = 60;
     document.getElementById("time-left").innerText = timeLeft;
+    document.getElementById("my-score-display").innerText = myScore;
+
     let q = questions[idx];
     document.getElementById("current-phase").innerText = q.phase;
     document.getElementById("question-text").innerText = "[" + q.subject + "] " + q.question;
@@ -735,23 +862,6 @@ function loadPhase(idx) {
         box.appendChild(btn);
     });
 
-    if (!_muteVoz) {
-        document.querySelectorAll(".option-btn").forEach(b => b.disabled = true);
-        lerPergunta(q);
-        let waitVoice = setInterval(() => {
-            if (!window.speechSynthesis || !speechSynthesis.speaking) {
-                clearInterval(waitVoice);
-                document.querySelectorAll(".option-btn").forEach(b => b.disabled = false);
-                startTimer(q);
-            }
-        }, 300);
-    } else {
-        startTimer(q);
-    }
-}
-
-function startTimer(q) {
-    clearInterval(timerInterval);
     timerInterval = setInterval(() => {
         timeLeft--;
         document.getElementById("time-left").innerText = timeLeft;
@@ -759,203 +869,308 @@ function startTimer(q) {
             document.getElementById("mascot").innerText = "🧐";
             document.getElementById("mascot-speech").innerText = "O tempo está acabando!";
         }
-        if (timeLeft <= 0) {
-            clearInterval(timerInterval);
-            submitAnswer("", q.answer, q.options, null);
-        }
+        if (timeLeft <= 0) { clearInterval(timerInterval); submitAnswer("", q.answer, q.options, null); }
     }, 1000);
 }
 
-function submitAnswer(selected, correct, allOptions, clickedBtn) {
+// ═══════════════════════════════════════════════════════════════
+//  SUBMETER RESPOSTA
+// ═══════════════════════════════════════════════════════════════
+async function submitAnswer(selected, correct, allOptions, clickedBtn) {
     clearInterval(timerInterval);
-    pararVoz();
 
-    let btns = document.querySelectorAll(".option-btn");
-    btns.forEach(b => {
+    document.querySelectorAll(".option-btn").forEach(b => {
         b.disabled = true;
         if (b === clickedBtn) b.classList.add("selected-answer");
     });
 
-    let points = 0;
-    if (selected === correct) points = timeLeft * 10;
+    let points = (selected === correct) ? timeLeft * 10 : 0;
     myScore += points;
+    myLastSelected = selected;
+    myLastCorrect  = correct;
+    myLastPoints   = points;
 
-    database.ref("players/" + myId).update({
-        score: myScore,
-        answered: true
+    document.getElementById("my-score-display").innerText = myScore;
+
+    // Atualiza dados do jogador no Firebase
+    await fbUpdate("quiz/players/" + myId, {
+        score: myScore, answered: true, lastSelected: selected
     });
 
+    // Conta escolhas por alternativa
+    if (selected) {
+        let idx = currentQuestionIndex;
+        let countSnap = await fbGet("quiz/counts/" + idx + "/" + selected.replace(/\s+/g,"_"));
+        let cur = countSnap.val() || 0;
+        await fbSet("quiz/counts/" + idx + "/" + selected.replace(/\s+/g,"_"), cur + 1);
+    }
+
     setTimeout(() => {
-        document.getElementById("lock-status-text").innerText = "Aguarde o professor revelar a resposta...";
+        document.getElementById("lock-spinner").style.display = "block";
+        document.getElementById("lock-title").innerText  = "Resposta Enviada!";
+        document.getElementById("lock-subtitle").innerText = "Aguarde o professor revelar a resposta...";
+        document.getElementById("lock-result-area").innerHTML = "";
         document.getElementById("screen-locked").classList.remove("hidden");
     }, 400);
 }
 
+// ═══════════════════════════════════════════════════════════════
+//  RESULTADO NA LOCK SCREEN
+// ═══════════════════════════════════════════════════════════════
+function mostrarResultadoAluno(players, serverIdx) {
+    let resultArea = document.getElementById("lock-result-area");
+    if (!resultArea) return;
+    document.getElementById("lock-spinner").style.display = "none";
+
+    let acertou = myLastSelected === myLastCorrect;
+    let tempoEsgotado = !myLastSelected;
+
+    const msgsAcerto = ["Você mandou bem! Continue assim! 🚀","Incrível! Você conhece essa matéria! 📚","Isso aí! Resposta certinha! ✨","Que mente afiada! Arrasou! 🧠","Perfeito! Você está no caminho certo! 🏆"];
+    const msgsErro   = ["Não desanime! Você vai aprender com isso! 💪","Quase! Fique ligado na próxima! 😊","Errando também se aprende! Vai na próxima! 📖","Não foi dessa vez, mas você consegue! 🌟","Cada erro é uma lição! Segura a emoção! 🎯"];
+    const msgsTempo  = ["Ops! O tempo acabou! Na próxima seja mais rápido! ⏰","Tempo esgotado! Confia mais em você! ⚡"];
+
+    let msg, emoji, cls, ptsTxt;
+    if (tempoEsgotado) {
+        msg = msgsTempo[Math.floor(Math.random()*msgsTempo.length)]; emoji="⌛"; cls="tempo"; ptsTxt="";
+    } else if (acertou) {
+        msg = msgsAcerto[Math.floor(Math.random()*msgsAcerto.length)];
+        emoji = ["🎉","🥳","🌟","🏅","💥"][Math.floor(Math.random()*5)]; cls="acertou";
+        ptsTxt = `<span class="lock-pts-gained">+${myLastPoints} pontos ⭐</span>`;
+    } else {
+        msg = msgsErro[Math.floor(Math.random()*msgsErro.length)];
+        emoji = ["😅","🤔","💡","📝","🙏"][Math.floor(Math.random()*5)]; cls="errou"; ptsTxt="";
+    }
+
+    let sorted = Object.values(players).sort((a,b) => b.score - a.score);
+    let pos = sorted.findIndex(p => p.name === myName) + 1;
+    let medals = {1:"🥇",2:"🥈",3:"🥉"};
+    let posStr = (medals[pos]||"") + " " + pos + "º lugar";
+
+    resultArea.innerHTML = `
+        <div class="lock-result-box ${cls}">
+            <span class="lock-result-emoji">${emoji}</span>
+            <div>${acertou?"ACERTOU!":tempoEsgotado?"TEMPO ESGOTADO":"ERROU!"}</div>
+            <div class="lock-result-msg">${msg}</div>
+            ${ptsTxt}
+            <div class="lock-ranking-box">
+                <div class="lock-ranking-pos">${posStr}</div>
+                <div style="font-size:.85rem;font-weight:normal;margin-top:2px;">de ${sorted.length} participantes • ${myScore} pts total</div>
+            </div>
+        </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  PROFESSOR — autenticação e sync
+// ═══════════════════════════════════════════════════════════════
 function openAdminAuth() {
+    if (!_fbReady) { alert("Aguarde o Firebase carregar..."); return; }
     let pass = prompt("Digite a senha do administrador:");
     if (pass === "123456") {
         isAdmin = true;
         showScreen("screen-admin");
-        listenToDatabase();
+        startAdminSync();
     } else {
         alert("Senha incorreta!");
     }
 }
 
-function startGame() {
-    database.ref("players").once("value", snap => {
-        if (!snap.exists()) {
-            alert("Nenhum aluno entrou na sala ainda!");
-            return;
-        }
-        database.ref("room").set({
-            state: "playing",
-            currentIndex: 0,
-            allAnswered: "0"
-        });
-        document.getElementById("admin-lobby-view").classList.add("hidden");
-        document.getElementById("admin-game-view").classList.remove("hidden");
-        adminLoadQuestion(0);
+function startAdminSync() {
+    window._fb.onValue(fbRef("quiz/players"), snap => {
+        let players = snap.val() || {};
+        let vals = Object.values(players);
+        let total = vals.length, answered = vals.filter(p=>p.answered).length;
+
+        let html = vals.map(p =>
+            `<div class="player-item">${p.avatar} <b>${p.name}</b> — Fase ${(p.currentPhase||0)+1} — ${p.score} pts ${p.answered?"✅":"⏳"}</div>`
+        ).join("") || "<p style='color:#aaa'>Nenhum aluno ainda...</p>";
+
+        let ll = document.getElementById("admin-players-list-lobby");
+        if (ll) ll.innerHTML = html;
+        let gl = document.getElementById("admin-players-list-game");
+        if (gl) gl.innerHTML = html;
+
+        let ie = document.getElementById("admin-answered-info");
+        if (ie) ie.innerText = total > 0 ? answered + " de " + total + " alunos responderam" : "";
+
+        buildScoreboard(players, "admin-scoreboard");
     });
 }
 
-function adminLoadQuestion(idx) {
-    if (idx >= questions.length) { adminEndGame(); return; }
+// ═══════════════════════════════════════════════════════════════
+//  PROFESSOR — iniciar jogo
+// ═══════════════════════════════════════════════════════════════
+async function startGame() {
+    let players = await getPlayers();
+    if (Object.keys(players).length === 0) { alert("Nenhum aluno entrou na sala ainda!"); return; }
+    await fbUpdate("quiz/room", { state:"playing", currentIndex:0, revealed:-1 });
+    document.getElementById("admin-lobby-view").classList.add("hidden");
+    document.getElementById("admin-game-view").classList.remove("hidden");
+    adminLoadQuestion(0);
+}
 
+// ═══════════════════════════════════════════════════════════════
+//  PROFESSOR — carregar questão
+// ═══════════════════════════════════════════════════════════════
+async function adminLoadQuestion(idx) {
+    if (idx >= questions.length) { adminEndGame(); return; }
     let q = questions[idx];
     let pct = Math.round(((idx+1)/questions.length)*100);
 
     document.getElementById("admin-phase-badge").textContent = "Fase " + q.phase + " — " + q.subject;
-    document.getElementById("admin-phase-badge").className = "phase-badge " + subjectBadgeClass[q.subject];
-    document.getElementById("admin-progress").style.width = pct + "%";
+    document.getElementById("admin-phase-badge").className   = "phase-badge " + subjectBadgeClass[q.subject];
+    document.getElementById("admin-progress").style.width    = pct + "%";
     document.getElementById("admin-phase-label").textContent = "Fase " + q.phase + " de " + questions.length;
     document.getElementById("admin-question-text").textContent = q.question;
     document.getElementById("admin-answer-box").classList.add("hidden");
-    document.getElementById("btn-reveal-admin").disabled = false;
-    document.getElementById("btn-next-admin").style.display = "none";
-    
+    document.getElementById("btn-reveal-admin").disabled     = false;
+    document.getElementById("btn-next-admin").style.display  = "none";
+
+    let old = document.getElementById("pct-wrap-admin");
+    if (old) old.remove();
+
     let ul = document.getElementById("admin-options-list");
     ul.innerHTML = q.options.map(o => `<li id="adm-opt-${o.replace(/\s+/g,'_')}">${o}</li>`).join("");
 
-    database.ref("players").once("value", snap => {
-        const pData = snap.val() || {};
-        Object.keys(pData).forEach(k => {
-            database.ref("players/" + k).update({ answered: false, currentPhase: idx });
-        });
-    });
+    // Reseta respondidos no Firebase
+    let players = await getPlayers();
+    let updates = {};
+    Object.keys(players).forEach(k => { updates["quiz/players/" + k + "/answered"] = false; });
+    updates["quiz/room/currentIndex"] = idx;
+    updates["quiz/room/revealed"]     = -1;
+    await fbUpdate("/", updates);
 
-    database.ref("room").update({
-        currentIndex: idx,
-        allAnswered: "0"
-    });
+    if (!_muteAdminVoz) lerPergunta(q);
 
     clearInterval(adminTimerInterval);
-    adminTimerVal = 30;
-    document.getElementById("admin-timer").textContent = adminTimerVal;
-    document.getElementById("admin-timer-bar").style.width = "100%";
+    adminTimerVal = 60;
+    document.getElementById("admin-timer").textContent      = adminTimerVal;
+    document.getElementById("admin-timer-bar").style.width  = "100%";
     adminTimerInterval = setInterval(() => {
         adminTimerVal--;
-        document.getElementById("admin-timer").textContent = adminTimerVal;
-        document.getElementById("admin-timer-bar").style.width = Math.round((adminTimerVal/30)*100) + "%";
+        document.getElementById("admin-timer").textContent     = adminTimerVal;
+        document.getElementById("admin-timer-bar").style.width = Math.round((adminTimerVal/60)*100) + "%";
         if (adminTimerVal <= 0) clearInterval(adminTimerInterval);
     }, 1000);
 }
 
-function adminRevealAnswer() {
+// ═══════════════════════════════════════════════════════════════
+//  PROFESSOR — revelar resposta
+// ═══════════════════════════════════════════════════════════════
+async function adminRevealAnswer() {
     clearInterval(adminTimerInterval);
-    let idx = currentQuestionIndex >= 0 ? currentQuestionIndex : 0;
-    let q = questions[idx];
+    let roomSnap = await fbGet("quiz/room");
+    let room = roomSnap.val() || {};
+    let idx = room.currentIndex ?? 0;
+    let q   = questions[idx];
+
+    // Sinaliza para alunos
+    await fbUpdate("quiz/room", { revealed: idx });
+
+    // Destaca resposta correta
     let key = q.answer.replace(/\s+/g,"_");
-    let li = document.getElementById("adm-opt-" + key);
+    let li  = document.getElementById("adm-opt-" + key);
     if (li) li.classList.add("correct");
+
     document.getElementById("admin-answer-text").textContent = q.answer;
     document.getElementById("admin-answer-box").classList.remove("hidden");
-    document.getElementById("btn-reveal-admin").disabled = true;
+    document.getElementById("btn-reveal-admin").disabled    = true;
     document.getElementById("btn-next-admin").style.display = "inline-block";
-    if (!_muteVoz) lerResposta(q.answer);
+
+    mostrarPorcentagens(idx, q);
+    if (!_muteAdminVoz) lerResposta(q.answer);
+}
+
+async function mostrarPorcentagens(idx, q) {
+    let snap   = await fbGet("quiz/counts/" + idx);
+    let counts = snap.val() || {};
+    let total  = Object.values(counts).reduce((s,v) => s+v, 0) || 1;
+
+    let html = "<div class='pct-bar-wrap'>";
+    q.options.forEach(opt => {
+        let key = opt.replace(/\s+/g,"_");
+        let n   = counts[key] || 0;
+        let pct = Math.round((n/total)*100);
+        let isCorrect = opt === q.answer;
+        html += `<div class='pct-bar-row'>
+            <span class='pct-bar-label' title='${opt}'>${opt}</span>
+            <div class='pct-bar-bg'><div class='pct-bar-fill ${isCorrect?"correct-bar":""}' style='width:${pct}%'></div></div>
+            <span class='pct-num'>${pct}%</span>
+        </div>`;
+    });
+    html += "</div>";
+
+    let ul  = document.getElementById("admin-options-list");
+    let old = document.getElementById("pct-wrap-admin");
+    if (old) old.remove();
+    let div = document.createElement("div");
+    div.id = "pct-wrap-admin";
+    div.innerHTML = html;
+    ul.after(div);
 }
 
 function adminNextPhase() {
-    let idx = currentQuestionIndex >= 0 ? currentQuestionIndex : 0;
-    adminLoadQuestion(idx + 1);
-    adminTab("tab-q", document.querySelector(".nav-tab"));
+    fbGet("quiz/room").then(snap => {
+        let idx = (snap.val() || {}).currentIndex ?? 0;
+        adminLoadQuestion(idx + 1);
+        adminTab("tab-q", document.querySelector(".nav-tab"));
+    });
 }
 
 function adminTab(tabId, btn) {
-    ["tab-q","tab-score","tab-players"].forEach(t => {
-        document.getElementById(t).classList.add("hidden");
-    });
+    ["tab-q","tab-score","tab-players"].forEach(t => document.getElementById(t).classList.add("hidden"));
     document.getElementById(tabId).classList.remove("hidden");
     document.querySelectorAll(".nav-tab").forEach(t => t.classList.remove("active"));
     btn.classList.add("active");
 }
 
-function adminEndGame() {
+async function adminEndGame() {
     clearInterval(adminTimerInterval);
-    database.ref("room/state").set("finished");
+    await fbUpdate("quiz/room", { state:"finished" });
+    let players = await getPlayers();
     showScreen("screen-end");
-    database.ref("players").once("value", snap => {
-        initPodio(snap.val() || {});
-    });
+    initPodio(players);
 }
 
+// ═══════════════════════════════════════════════════════════════
+//  PÓDIO E FIM
+// ═══════════════════════════════════════════════════════════════
 function buildScoreboard(players, elementId) {
     let el = document.getElementById(elementId);
     if (!el) return;
-    let sorted = Object.values(players).sort((a,b) => (b.score || 0) - (a.score || 0));
-    if (sorted.length === 0) { el.innerHTML = "<p style='color:#aaa;text-align:center'>Nenhum jogador ainda.</p>"; return; }
+    let sorted = Object.values(players).sort((a,b) => b.score-a.score);
+    if (!sorted.length) { el.innerHTML = "<p style='color:#aaa;text-align:center'>Nenhum jogador.</p>"; return; }
     let medals = ["🥇","🥈","🥉"];
     el.innerHTML = sorted.map((p,i) =>
-        `<div class="score-rank">${medals[i] || (i+1)+"°"} ${p.avatar} <b>${p.name}</b> <span style="margin-left:auto;color:#555;">${p.score || 0} pts</span></div>`
+        `<div class="score-rank">${medals[i]||(i+1)+"°"} ${p.avatar} <b>${p.name}</b> <span style="margin-left:auto;color:#555;">${p.score} pts</span></div>`
     ).join("");
 }
 
-let _podioSorted = [];
-
 function initPodio(players) {
-    _podioSorted = Object.values(players).sort((a,b) => (b.score || 0) - (a.score || 0));
+    _podioSorted = Object.values(players).sort((a,b) => b.score-a.score);
     function fill(rank, idx) {
         let p = _podioSorted[idx];
         if (!p) return;
-        document.getElementById("av-" + rank).innerText = p.avatar;
-        document.getElementById("nm-" + rank).innerText = p.name;
-        document.getElementById("pt-" + rank).innerText = (p.score || 0) + " pontos";
+        document.getElementById("av-"+rank).innerText = p.avatar;
+        document.getElementById("nm-"+rank).innerText = p.name;
+        document.getElementById("pt-"+rank).innerText = p.score + " pontos";
     }
-    fill(1, 0);
-    fill(2, 1);
-    fill(3, 2);
-    let btn3 = document.getElementById("btn-show3");
-    if (_podioSorted.length < 3) btn3.innerText = "🥉 Revelar último lugar";
-    if (_podioSorted.length < 2) { btn3.innerText = "🥇 Revelar vencedor"; }
+    fill(1,0); fill(2,1); fill(3,2);
 }
 
 function showPodio(rank) {
-    let stepEl = document.getElementById("step-" + rank);
-    let cardEl = document.getElementById("card-" + rank);
-
+    let stepEl = document.getElementById("step-"+rank);
+    let cardEl = document.getElementById("card-"+rank);
     stepEl.style.display = "block";
-    document.getElementById("btn-show" + rank).disabled = true;
-
+    document.getElementById("btn-show"+rank).disabled = true;
     setTimeout(() => {
         stepEl.querySelector(".dots-anim").style.display = "none";
         cardEl.classList.add("active");
-
         if (rank === 1) {
-            setTimeout(() => {
-                document.getElementById("parabens-nome").innerText = _podioSorted[0]?.name || "";
-                document.getElementById("parabens-box").style.display = "block";
-                launchConfetti();
-            }, 600);
-            setTimeout(() => {
-                document.getElementById("btn-showall").style.display = "inline-block";
-            }, 1200);
+            setTimeout(iniciarSuspense1, 400);
         } else {
             let next = rank - 1;
-            let nextBtn = document.getElementById("btn-show" + next);
-            if (nextBtn) {
-                nextBtn.style.display = "inline-block";
-                setTimeout(() => { nextBtn.disabled = false; }, 300);
-            }
+            let nb = document.getElementById("btn-show"+next);
+            if (nb) { nb.style.display="inline-block"; setTimeout(()=>{ nb.disabled=false; },300); }
         }
     }, 2200);
 }
@@ -969,156 +1184,145 @@ function showFullTable() {
     let medals = ["🥇","🥈","🥉"];
     rowsDiv.innerHTML = _podioSorted.map((p,i) =>
         `<div class="table-row ${cls[i]||''}">
-            <span class="table-pos">${medals[i]||((i+1)+"°")}</span>
+            <span class="table-pos">${medals[i]||(i+1)+"°"}</span>
             <span class="table-av">${p.avatar}</span>
             <span class="table-name">${p.name}</span>
-            <span class="table-pts">${p.score || 0} pontos</span>
+            <span class="table-pts">${p.score} pontos</span>
         </div>`
     ).join("");
 }
 
-function launchConfetti() {
-    let canvas = document.getElementById("confetti-canvas");
-    if (!canvas) return;
-    let ctx = canvas.getContext("2d");
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    let pieces = [];
-    let colors = ["#ff4757","#ffa502","#2ed573","#1e90ff","#ff6b81","#eccc68","#a29bfe","#fd79a8","#00cec9","#fdcb6e"];
-    for (let i = 0; i < 180; i++) {
-        pieces.push({
-            x: Math.random() * canvas.width,
-            y: Math.random() * -canvas.height,
-            w: 8 + Math.random() * 10,
-            h: 6 + Math.random() * 8,
-            color: colors[Math.floor(Math.random() * colors.length)],
-            rot: Math.random() * 360,
-            vx: (Math.random() - 0.5) * 3,
-            vy: 2 + Math.random() * 4,
-            vr: (Math.random() - 0.5) * 6
-        });
+// ═══════════════════════════════════════════════════════════════
+//  SUSPENSE 1º LUGAR
+// ═══════════════════════════════════════════════════════════════
+function tocarTambor(vezes, intervalo, onFim) {
+    let AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) { if(onFim) onFim(); return; }
+    let ctx = new AudioCtx();
+    function batida(t) {
+        let osc = ctx.createOscillator(), gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.type="sine"; osc.frequency.setValueAtTime(150,t); osc.frequency.exponentialRampToValueAtTime(40,t+0.3);
+        gain.gain.setValueAtTime(1,t); gain.gain.exponentialRampToValueAtTime(0.001,t+0.35);
+        osc.start(t); osc.stop(t+0.35);
+        let bufSize=ctx.sampleRate*0.12, buf=ctx.createBuffer(1,bufSize,ctx.sampleRate);
+        let data=buf.getChannelData(0); for(let i=0;i<bufSize;i++) data[i]=(Math.random()*2-1);
+        let src=ctx.createBufferSource(), filt=ctx.createBiquadFilter(), gn=ctx.createGain();
+        src.buffer=buf; filt.type="bandpass"; filt.frequency.value=2000; filt.Q.value=0.8;
+        src.connect(filt); filt.connect(gn); gn.connect(ctx.destination);
+        gn.gain.setValueAtTime(0.6,t); gn.gain.exponentialRampToValueAtTime(0.001,t+0.12);
+        src.start(t); src.stop(t+0.12);
     }
+    let now=ctx.currentTime+0.05, t=0, iv=intervalo/1000;
+    for(let i=0;i<vezes;i++) { batida(now+t); t+=iv*(1-(i/vezes)*0.55); }
+    if(onFim) setTimeout(onFim, t*1000+200);
+}
+
+function iniciarSuspense1() {
+    let p = _podioSorted[0]; if(!p) return;
+    document.getElementById("reveal-av-big").innerText = p.avatar;
+    document.getElementById("reveal-nm-big").innerText = p.name;
+    document.getElementById("reveal-pt-big").innerText = p.score+" pontos";
+    let ov = document.getElementById("suspense-overlay");
+    ov.classList.add("ativo");
+    document.getElementById("suspense-fase-1").style.display = "block";
+    document.getElementById("reveal-nome-1").classList.remove("visivel");
+    document.getElementById("btn-fechar-suspense").style.display = "none";
+    tocarTambor(22, 320, () => {
+        document.getElementById("suspense-fase-1").style.display="none";
+        document.getElementById("reveal-nome-1").classList.add("visivel");
+        launchConfetti();
+        setTimeout(()=>{ document.getElementById("btn-fechar-suspense").style.display="inline-block"; }, 1500);
+    });
+}
+
+function fecharSuspense() {
+    document.getElementById("suspense-overlay").classList.remove("ativo");
+    document.getElementById("parabens-nome").innerText = _podioSorted[0]?.name||"";
+    document.getElementById("parabens-box").style.display="block";
+    document.getElementById("btn-showall").style.display="inline-block";
+    launchConfetti();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  CONFETE
+// ═══════════════════════════════════════════════════════════════
+function launchConfetti() {
+    let canvas=document.getElementById("confetti-canvas"); if(!canvas) return;
+    let ctx=canvas.getContext("2d");
+    canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+    let pieces=[], colors=["#ff4757","#ffa502","#2ed573","#1e90ff","#ff6b81","#eccc68","#a29bfe","#fd79a8","#00cec9","#fdcb6e"];
+    for(let i=0;i<180;i++) pieces.push({ x:Math.random()*canvas.width, y:Math.random()*-canvas.height, w:8+Math.random()*10, h:6+Math.random()*8, color:colors[Math.floor(Math.random()*colors.length)], rot:Math.random()*360, vx:(Math.random()-.5)*3, vy:2+Math.random()*4, vr:(Math.random()-.5)*6 });
     let frame;
     function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        pieces.forEach(p => {
-            ctx.save();
-            ctx.translate(p.x + p.w/2, p.y + p.h/2);
-            ctx.rotate(p.rot * Math.PI / 180);
-            ctx.fillStyle = p.color;
-            ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
-            ctx.restore();
-            p.x += p.vx; p.y += p.vy; p.rot += p.vr;
-        });
-        pieces = pieces.filter(p => p.y < canvas.height + 20);
-        if (pieces.length > 0) frame = requestAnimationFrame(draw);
-        else ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        pieces.forEach(p => { ctx.save(); ctx.translate(p.x+p.w/2,p.y+p.h/2); ctx.rotate(p.rot*Math.PI/180); ctx.fillStyle=p.color; ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore(); p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr; });
+        pieces=pieces.filter(p=>p.y<canvas.height+20);
+        if(pieces.length>0) frame=requestAnimationFrame(draw); else ctx.clearRect(0,0,canvas.width,canvas.height);
     }
     draw();
-    [800, 1600, 2600].forEach(delay => {
-        setTimeout(() => {
-            for (let i = 0; i < 80; i++) {
-                pieces.push({
-                    x: Math.random() * canvas.width,
-                    y: -10,
-                    w: 8 + Math.random() * 10, h: 6 + Math.random() * 8,
-                    color: colors[Math.floor(Math.random() * colors.length)],
-                    rot: Math.random() * 360,
-                    vx: (Math.random() - 0.5) * 3,
-                    vy: 2 + Math.random() * 4,
-                    vr: (Math.random() - 0.5) * 6
-                });
-            }
-            if (!frame) draw();
-        }, delay);
-    });
+    [800,1600,2600].forEach(delay => setTimeout(()=>{
+        for(let i=0;i<80;i++) pieces.push({ x:Math.random()*canvas.width, y:-10, w:8+Math.random()*10, h:6+Math.random()*8, color:colors[Math.floor(Math.random()*colors.length)], rot:Math.random()*360, vx:(Math.random()-.5)*3, vy:2+Math.random()*4, vr:(Math.random()-.5)*6 });
+        if(!frame) draw();
+    }, delay));
 }
 
-function clearServer() {
-    if (confirm("Deseja realmente resetar a sala e desconectar todos os alunos?")) {
-        database.ref("/").remove().then(() => {
-            alert("Sala limpa com sucesso!");
-            location.reload();
-        });
-    }
+// ═══════════════════════════════════════════════════════════════
+//  RESETAR SALA
+// ═══════════════════════════════════════════════════════════════
+async function clearServer() {
+    clearInterval(timerInterval);
+    clearInterval(adminTimerInterval);
+    await fbRemove("quiz");
+    alert("Sala resetada com sucesso!");
+    location.reload();
 }
 
-function checkActiveSession() {
-    database.ref("room/state").once("value", snapshot => {
-        const roomState = snapshot.val() || "idle";
-        database.ref("players/" + myId).once("value", snap => {
-            if (snap.exists() && (roomState === "playing" || roomState === "idle")) {
-                const p = snap.val();
-                myName = p.name;
-                myAvatar = p.avatar;
-                myScore = p.score || 0;
-                setupAntiCheat();
-                if (roomState === "playing") { gameActive = true; showScreen("screen-game"); }
-                else showScreen("screen-lobby");
-                listenToDatabase();
-            }
-        });
-    });
+// ═══════════════════════════════════════════════════════════════
+//  SESSÃO ATIVA (recarregou a página?)
+// ═══════════════════════════════════════════════════════════════
+async function checkActiveSession() {
+    let snap = await fbGet("quiz/players/" + myId);
+    let me   = snap.val();
+    if (!me) return; // não estava na sala
+    myName   = me.name;
+    myAvatar = me.avatar;
+    myScore  = me.score;
+    let roomSnap = await fbGet("quiz/room");
+    let state = (roomSnap.val()||{}).state||"idle";
+    if (state === "playing") { showScreen("screen-game"); startStudentSync(); }
+    else if (state === "idle" || state === "waiting") { showScreen("screen-lobby"); startStudentSync(); }
 }
 
+// ═══════════════════════════════════════════════════════════════
+//  VOZ (TTS) — exclusivo professor
+// ═══════════════════════════════════════════════════════════════
 let _ttsVoice = null;
-let _ttsSpeaking = false;
-
 function initVoice() {
     if (!window.speechSynthesis) return;
-    function pickVoice() {
-        let voices = speechSynthesis.getVoices();
-        _ttsVoice = voices.find(v => v.lang === "pt-BR")
-                 || voices.find(v => v.lang.startsWith("pt"))
-                 || voices[0]
-                 || null;
-    }
-    pickVoice();
-    speechSynthesis.onvoiceschanged = pickVoice;
+    function pick() { let v=speechSynthesis.getVoices(); _ttsVoice=v.find(x=>x.lang==="pt-BR")||v.find(x=>x.lang.startsWith("pt"))||v[0]||null; }
+    pick(); speechSynthesis.onvoiceschanged = pick;
 }
-
-function falar(texto, onEnd) {
-    if (!window.speechSynthesis) { if(onEnd) onEnd(); return; }
+function falar(texto) {
+    if (!window.speechSynthesis) return;
     speechSynthesis.cancel();
-    _ttsSpeaking = true;
-    let utter = new SpeechSynthesisUtterance(texto);
-    utter.lang  = "pt-BR";
-    utter.rate  = 0.92;
-    utter.pitch = 1.1;
-    utter.volume = 1;
-    if (_ttsVoice) utter.voice = _ttsVoice;
-    utter.onend = () => { _ttsSpeaking = false; if(onEnd) onEnd(); };
-    utter.onerror = () => { _ttsSpeaking = false; if(onEnd) onEnd(); };
-    speechSynthesis.speak(utter);
+    let u = new SpeechSynthesisUtterance(texto);
+    u.lang="pt-BR"; u.rate=0.95; u.pitch=1.0; u.volume=1;
+    if(_ttsVoice) u.voice=_ttsVoice;
+    speechSynthesis.speak(u);
 }
-
-function pararVoz() {
-    if (window.speechSynthesis) speechSynthesis.cancel();
-    _ttsSpeaking = false;
-}
-
 function lerPergunta(q) {
-    pararVoz();
-    let letras = ["A.", "B.", "C.", "D."];
-    let opcoesTexto = q.options.map((o, i) => letras[i] + " " + o).join(". ");
-    let texto = q.subject + ". " + q.question + ". As alternativas são: " + opcoesTexto + ".";
-    falar(texto);
+    let letras=["A.","B.","C.","D."];
+    let ops = q.options.map((o,i)=>letras[i]+" "+o).join(". ");
+    falar(q.subject+". "+q.question+". As alternativas são: "+ops+".");
 }
-
-// Lê a resposta revelada
-function lerResposta(resposta) {
-    falar("A resposta correta é: " + resposta + "!");
+function lerResposta(r) { falar("A resposta correta é: "+r+"!"); }
+function toggleMuteAdmin() {
+    _muteAdminVoz = !_muteAdminVoz;
+    let btn = document.getElementById("btn-mute-admin");
+    if(btn) btn.innerText = _muteAdminVoz ? "🔇 Som off" : "🔊 Som on";
+    if(_muteAdminVoz && window.speechSynthesis) speechSynthesis.cancel();
 }
-
-let _muteVoz = false;
-function toggleMute() {
-    _muteVoz = !_muteVoz;
-    let btn = document.getElementById("btn-mute");
-    if (btn) btn.innerText = _muteVoz ? "🔇 Som off" : "🔊 Som on";
-    if (_muteVoz) pararVoz();
-}
-
-window.onload = function() { initVoice(); checkActiveSession(); listenToDatabase(); };
 </script>
 </body>
 </html>
