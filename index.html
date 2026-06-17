@@ -1,1328 +1,1790 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Educativo - Sala de Aula</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Os Elementos do Saber</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Nunito:wght@400;600;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0a14;font-family:'Nunito',sans-serif;color:#e8dfc8;min-height:100vh;display:flex;align-items:center;justify-content:center;}
+#gr{width:100%;max-width:600px;min-height:600px;background:#0a0a14;border-radius:14px;overflow:hidden;position:relative;}
+.stars-bg{position:absolute;inset:0;pointer-events:none;z-index:0}
+.star{position:absolute;background:#fff;border-radius:50%;animation:tw var(--d,3s) ease-in-out infinite var(--dl,0s)}
+@keyframes tw{0%,100%{opacity:.15}50%{opacity:.9}}
+.screen{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:600px;padding:1.75rem;text-align:center}
+.screen.off{display:none}
+.badge{font-family:'Cinzel',serif;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:#c8a84b;margin-bottom:.5rem;opacity:.85}
+.big-title{font-family:'Cinzel',serif;font-size:28px;font-weight:700;color:#f0d980;text-shadow:0 0 30px rgba(200,168,75,.5);line-height:1.2;margin-bottom:.25rem}
+.sub{font-size:14px;color:#9a8c7a;font-style:italic;margin-bottom:1.5rem}
+.divider{width:140px;height:1px;background:rgba(200,168,75,.4);margin:.75rem auto 1.4rem}
+.name-wrap{width:100%;max-width:320px;display:flex;flex-direction:column;gap:.85rem}
+.lbl{font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#c8a84b}
+.ninput{background:rgba(255,255,255,.05);border:1px solid rgba(200,168,75,.4);border-radius:8px;padding:.75rem 1rem;color:#f0d980;font-family:'Cinzel',serif;font-size:18px;font-weight:700;text-align:center;outline:none;transition:.3s;letter-spacing:2px;width:100%}
+.ninput::placeholder{color:#3a3028}
+.ninput:focus{border-color:#c8a84b;box-shadow:0 0 16px rgba(200,168,75,.18)}
+.btn{font-family:'Cinzel',serif;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;padding:.8rem 1.75rem;background:rgba(200,168,75,.15);border:1px solid rgba(200,168,75,.6);color:#c8a84b;border-radius:8px;cursor:pointer;transition:.2s;width:100%}
+.btn:hover{background:rgba(200,168,75,.28);border-color:#c8a84b}
+.btn.go{background:rgba(100,200,130,.1);border-color:rgba(100,200,130,.5);color:#7dd9a0}
+.btn.go:hover{background:rgba(100,200,130,.22)}
+.btn.danger{background:rgba(200,70,70,.12);border-color:rgba(200,70,70,.5);color:#d08080}
+.btn.advance{background:linear-gradient(135deg,rgba(200,168,75,.3),rgba(240,217,128,.2));border-color:#f0d980;color:#f0d980;font-size:13px;animation:glowBtn 2s ease-in-out infinite;margin-top:.75rem}
+@keyframes glowBtn{0%,100%{box-shadow:0 0 10px rgba(200,168,75,.3)}50%{box-shadow:0 0 28px rgba(200,168,75,.8)}}
+.avatar-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;width:100%;max-width:420px;margin:.75rem 0 1.25rem}
+.av-card{background:rgba(255,255,255,.04);border:1px solid rgba(200,168,75,.18);border-radius:12px;padding:.9rem .5rem;cursor:pointer;transition:.25s;text-align:center}
+.av-card:hover,.av-card.sel{border-color:#c8a84b;background:rgba(200,168,75,.1)}
+.av-emoji{font-size:32px;display:block;margin-bottom:.3rem}
+.av-name{font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#c8a84b}
+.av-tip{font-size:11px;color:#5a5040;margin-top:.2rem;font-style:italic}
+#intro-screen{justify-content:flex-end;padding-bottom:2.25rem}
+.scene-bg{position:absolute;top:50%;left:50%;transform:translate(-50%,-58%);font-size:150px;opacity:.09;pointer-events:none;animation:fl 5s ease-in-out infinite}
+@keyframes fl{0%,100%{transform:translate(-50%,-58%)}50%{transform:translate(-50%,-65%)}}
+.nar-box{background:rgba(10,8,25,.88);border:1px solid rgba(200,168,75,.22);border-radius:12px;padding:1.4rem 1.6rem;max-width:520px;width:100%;backdrop-filter:blur(3px)}
+.voice-tag{font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#c8a84b;margin-bottom:.65rem;display:flex;align-items:center;gap:.5rem}
+.vpulse{width:8px;height:8px;border-radius:50%;background:#c8a84b;animation:pulse 1.4s ease-in-out infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+.voice-btn{background:none;border:1px solid rgba(200,168,75,.35);border-radius:5px;color:#c8a84b;font-size:11px;padding:.2rem .5rem;cursor:pointer;font-family:'Cinzel',serif;letter-spacing:1px;transition:.2s;margin-left:auto}
+.voice-btn:hover{background:rgba(200,168,75,.15)}
+.nar-txt{font-size:16px;line-height:1.85;color:#d8d0bc;min-height:56px;text-align:left}
+.cur{display:inline-block;width:2px;height:1em;background:#c8a84b;vertical-align:middle;animation:bl .7s step-end infinite;margin-left:2px}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:0}}
+.cnt-hint{font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(200,168,75,.4);margin-top:.85rem;cursor:pointer;transition:.2s}
+.cnt-hint:hover{color:rgba(200,168,75,.9)}
+.cnt-hint.off{visibility:hidden}
+.prof-strip{display:flex;align-items:center;gap:.75rem;background:rgba(200,168,75,.07);border:1px solid rgba(200,168,75,.2);border-radius:9px;padding:.6rem 1.1rem;margin-bottom:.9rem;width:100%;max-width:480px}
+.pav{font-size:24px}
+.pname{font-family:'Cinzel',serif;font-size:14px;color:#f0d980;letter-spacing:1px}
+.pclass{font-size:12px;color:#7a6e5a;font-style:italic}
+.global-lives{display:flex;align-items:center;gap:.4rem;background:rgba(200,70,70,.1);border:1px solid rgba(200,70,70,.25);border-radius:8px;padding:.4rem .9rem;margin-bottom:.75rem;width:100%;max-width:480px;justify-content:center;flex-wrap:wrap}
+.gl-label{font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#d08080;margin-right:.3rem}
+.hrt{font-size:17px;transition:.3s}
+.inv-bar{display:flex;align-items:center;gap:.5rem;background:rgba(200,168,75,.06);border:1px solid rgba(200,168,75,.18);border-radius:8px;padding:.4rem .9rem;margin-bottom:.75rem;width:100%;max-width:480px;min-height:40px;flex-wrap:wrap}
+.inv-label{font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#5a5040;margin-right:.3rem;white-space:nowrap}
+.inv-item{font-size:22px;animation:popIn .4s ease;cursor:default;transition:.2s}
+.inv-item:hover{transform:scale(1.2)}
+@keyframes popIn{0%{transform:scale(0) rotate(-20deg);opacity:0}60%{transform:scale(1.3) rotate(5deg)}100%{transform:scale(1);opacity:1}}
+.map-title{font-family:'Cinzel',serif;font-size:20px;color:#f0d980;margin-bottom:.2rem}
+.map-sub{font-size:13px;color:#9a8c7a;font-style:italic;margin-bottom:.9rem}
+.mod-divider{width:100%;max-width:480px;display:flex;align-items:center;gap:.75rem;margin:.4rem 0}
+.mod-line{flex:1;height:1px;background:rgba(200,168,75,.15)}
+.mod-label{font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;color:#5a5040;text-transform:uppercase;white-space:nowrap}
+.elems-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.65rem;width:100%;max-width:480px}
+.elem-btn{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:.85rem;cursor:pointer;transition:.22s;text-align:left;display:flex;align-items:center;gap:.65rem}
+.elem-btn:hover{background:rgba(255,255,255,.08);transform:translateY(-2px)}
+.elem-btn.done{border-color:rgba(100,200,130,.4);background:rgba(100,200,130,.06);cursor:default}
+.elem-btn.done:hover{transform:none}
+.el-ic{font-size:26px}
+.el-nm{font-family:'Cinzel',serif;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#c8a84b}
+.el-ht{font-size:11px;color:#5a5040;margin-top:2px;font-style:italic}
+.el-st{font-family:'Cinzel',serif;font-size:10px;font-weight:700;margin-top:4px;letter-spacing:1px}
+.done .el-st{color:#7dd9a0}
+.el-st.miss{color:#c06050}
+.sc-tag{font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;color:#5a5040;margin-top:.65rem;text-transform:uppercase}
+.ch-icon{font-size:44px;margin-bottom:.2rem}
+.ch-title{font-family:'Cinzel',serif;font-size:17px;color:#f0d980}
+.ch-desc{font-size:13px;color:#9a8c7a;font-style:italic;max-width:420px;margin:.25rem auto .5rem;line-height:1.5}
+.rule-tag{font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#c8a84b;background:rgba(200,168,75,.1);border:1px solid rgba(200,168,75,.22);border-radius:6px;padding:.25rem .7rem;margin-bottom:.5rem;display:inline-block}
+.prog-wrap{display:flex;align-items:center;gap:.65rem;margin-bottom:.5rem;max-width:480px;width:100%}
+.prog-lbl{font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;color:#7a6e5a;white-space:nowrap}
+.prog-bar{flex:1;height:4px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:#c8a84b;border-radius:2px;transition:width .5s}
+.phase-lives{display:flex;align-items:center;gap:.4rem;margin-bottom:.5rem;font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;color:#7a6e5a;text-transform:uppercase}
+.ch-nar-box{background:rgba(10,8,25,.75);border:1px solid rgba(200,168,75,.18);border-radius:9px;padding:.6rem 1rem;max-width:480px;width:100%;margin-bottom:.5rem;text-align:left;display:flex;align-items:flex-start;gap:.5rem}
+.ch-nar-txt{font-size:13px;color:#c8b890;line-height:1.5;flex:1;font-style:italic}
+.ch-voice-btn{background:none;border:none;color:#c8a84b;cursor:pointer;font-size:14px;padding:.1rem .3rem;flex-shrink:0;opacity:.7;transition:.2s}
+.ch-voice-btn:hover{opacity:1}
+.q-box{background:rgba(255,255,255,.04);border:1px solid rgba(200,168,75,.15);border-radius:12px;padding:.85rem 1rem;max-width:480px;width:100%;margin-bottom:.5rem}
+.q-txt{font-size:15px;color:#e0d8c8;margin-bottom:.75rem;line-height:1.6;display:flex;align-items:flex-start;gap:.4rem}
+.q-speak{background:none;border:none;color:#c8a84b;cursor:pointer;font-size:14px;padding:0 .2rem;opacity:.6;transition:.2s;flex-shrink:0;margin-top:.1rem}
+.q-speak:hover{opacity:1}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:.45rem}
+.opt{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:.55rem .7rem;color:#b8b0a0;cursor:pointer;font-family:'Nunito',sans-serif;font-size:13px;font-weight:600;transition:.2s;text-align:left;line-height:1.35}
+.opt:hover:not(:disabled){background:rgba(200,168,75,.12);border-color:rgba(200,168,75,.45);color:#f0d980}
+.opt.ok{background:rgba(100,200,130,.12);border-color:rgba(100,200,130,.5);color:#7dd9a0}
+.opt.no{background:rgba(200,70,70,.1);border-color:rgba(200,70,70,.4);color:#d08080}
+.fb{font-size:12px;padding:.5rem .8rem;border-radius:8px;margin-top:.5rem;display:none;line-height:1.5}
+.fb.ok{background:rgba(100,200,130,.08);color:#7dd9a0}
+.fb.no{background:rgba(200,70,70,.08);color:#d08080}
+.fail-box{background:rgba(200,70,70,.1);border:1px solid rgba(200,70,70,.28);border-radius:10px;padding:.9rem 1.1rem;max-width:480px;width:100%;margin:.4rem 0;text-align:center}
+.fail-title{font-family:'Cinzel',serif;font-size:14px;color:#d08080;margin-bottom:.3rem}
+.fail-sub{font-size:12px;color:#8a6060;line-height:1.5}
+.back-lnk{font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;background:transparent;border:none;color:rgba(200,168,75,.35);cursor:pointer;padding:.5rem;transition:.2s;width:100%;margin-top:.15rem}
+.back-lnk:hover{color:rgba(200,168,75,.8)}
+/* SKIP BUTTON */
+.skip-btn{position:absolute;top:.6rem;right:.7rem;font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.28);border-radius:6px;cursor:pointer;padding:.3rem .65rem;transition:.2s;z-index:20}
+.skip-btn:hover{background:rgba(255,255,255,.1);color:rgba(255,255,255,.7)}
+.skip-btn.blue{border-color:rgba(58,138,176,.3);color:rgba(58,138,176,.4);background:rgba(58,138,176,.05)}
+.skip-btn.blue:hover{background:rgba(58,138,176,.12);color:rgba(58,138,176,.8)}
+/* REWARD OVERLAY */
+.reward-overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:9999;display:flex;align-items:center;justify-content:center}
+.reward-card{background:#0f0e20;border:2px solid rgba(200,168,75,.6);border-radius:16px;padding:2rem 2.5rem;text-align:center;max-width:300px;width:90%;animation:slideUp .4s ease}
+@keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+.reward-icon-big{font-size:72px;display:block;margin-bottom:.5rem;animation:bounce .6s ease .1s both}
+@keyframes bounce{0%{transform:scale(0)}60%{transform:scale(1.2)}100%{transform:scale(1)}}
+.reward-title{font-family:'Cinzel',serif;font-size:12px;color:#c8a84b;letter-spacing:3px;text-transform:uppercase;margin-bottom:.3rem}
+.reward-name{font-family:'Cinzel',serif;font-size:20px;color:#f0d980;margin-bottom:.4rem}
+.reward-desc{font-size:13px;color:#9a8c7a;line-height:1.5;margin-bottom:.75rem;font-style:italic}
+.reward-bonus{font-family:'Cinzel',serif;font-size:11px;color:#7dd9a0;background:rgba(100,200,130,.12);border:1px solid rgba(100,200,130,.3);border-radius:6px;padding:.3rem .8rem;margin-bottom:.75rem}
+.reward-close{font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;padding:.7rem 1.5rem;background:rgba(200,168,75,.2);border:2px solid rgba(200,168,75,.6);color:#c8a84b;border-radius:8px;cursor:pointer;width:100%;transition:.2s}
+.reward-close:hover{background:rgba(200,168,75,.4);color:#f0d980}
+/* TOAST */
+.toast{position:fixed;top:18px;left:50%;transform:translateX(-50%);background:rgba(100,200,130,.2);border:1px solid rgba(100,200,130,.6);border-radius:8px;padding:.5rem 1.2rem;font-family:'Cinzel',serif;font-size:12px;color:#7dd9a0;z-index:9000;letter-spacing:1px;pointer-events:none;animation:toastIn .3s ease}
+@keyframes toastIn{from{opacity:0;top:0}to{opacity:1;top:18px}}
+/* VIC / DEAD */
+.vic-icon{font-size:60px;margin-bottom:.5rem;animation:fl 3s ease-in-out infinite}
+.vic-title{font-family:'Cinzel',serif;font-size:24px;color:#f0d980;text-shadow:0 0 24px rgba(240,217,128,.4);margin-bottom:.4rem}
+.vic-sub{font-size:14px;color:#9a8c7a;max-width:420px;margin:0 auto .75rem;line-height:1.6;font-style:italic}
+.vic-inv{display:flex;align-items:center;justify-content:center;gap:.5rem;margin-bottom:.75rem;font-size:28px;flex-wrap:wrap}
+.vic-score{font-family:'Cinzel',serif;font-size:12px;letter-spacing:2px;background:rgba(200,168,75,.1);border:1px solid rgba(200,168,75,.3);border-radius:9px;padding:.65rem 1.25rem;color:#c8a84b;margin-bottom:1rem;text-transform:uppercase}
+.dead-icon{font-size:60px;margin-bottom:.5rem;animation:shake .5s ease-in-out 3}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.dead-title{font-family:'Cinzel',serif;font-size:26px;color:#c06050;text-shadow:0 0 20px rgba(200,70,70,.4);margin-bottom:.5rem}
+.dead-sub{font-size:14px;color:#7a5050;max-width:380px;margin:0 auto 1.2rem;line-height:1.6;font-style:italic}
+.dead-score{font-family:'Cinzel',serif;font-size:12px;letter-spacing:2px;background:rgba(200,70,70,.1);border:1px solid rgba(200,70,70,.3);border-radius:9px;padding:.6rem 1.25rem;color:#c06050;margin-bottom:1.2rem;text-transform:uppercase}
 
-    <!-- ════════════════════════════════════════════════════
-         ⚠️  CONFIGURAÇÃO DO FIREBASE  ⚠️
-         Siga os passos no "Guia de Configuração" abaixo
-         para preencher estas credenciais com as suas.
-         ════════════════════════════════════════════════════ -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import {
-            getDatabase, ref, set, get, update, onValue, remove, push, child
-        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+/* ── VILLAIN SCENE ── */
+#villain-screen{background:#0a0a14;justify-content:flex-end;padding-bottom:2.5rem}
+.vill-scene-bg{position:absolute;top:50%;left:50%;transform:translate(-50%,-58%);font-size:160px;opacity:.07;pointer-events:none;transition:opacity 1s,filter 1s}
+.vill-box{background:rgba(10,8,25,.92);border:1px solid rgba(200,168,75,.2);border-radius:12px;padding:1.4rem 1.6rem;max-width:520px;width:100%;backdrop-filter:blur(3px);transition:border-color .5s}
+.vill-box.angry{border-color:rgba(200,50,50,.6)!important;box-shadow:0 0 30px rgba(200,30,30,.2)}
+.vill-voice-tag{font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;margin-bottom:.65rem;display:flex;align-items:center;gap:.5rem;transition:color .5s}
+.vill-voice-tag.good{color:#c8a84b}
+.vill-voice-tag.bad{color:#c05050}
+.vpulse-vill{width:8px;height:8px;border-radius:50%;animation:pulse 1.4s ease-in-out infinite;flex-shrink:0;transition:background .5s}
+.vpulse-vill.good{background:#c8a84b}
+.vpulse-vill.bad{background:#c05050;animation:pulseBad .7s ease-in-out infinite}
+@keyframes pulseBad{0%,100%{opacity:.4;transform:scale(.8)}50%{opacity:1;transform:scale(1.4)}}
+.vill-txt{font-size:16px;line-height:1.85;min-height:56px;text-align:left;transition:color .5s}
+.vill-txt.good{color:#d8d0bc}
+.vill-txt.bad{color:#e06060;font-weight:700;letter-spacing:.5px}
+.vill-txt .hlv{color:#f0d980;font-weight:700}
+.vill-txt .hlr{color:#ff4444;font-weight:700}
+.vill-hint{font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(200,168,75,.4);margin-top:.85rem;cursor:pointer;transition:color .3s}
+.vill-hint:hover{color:rgba(200,168,75,.9)}
+.vill-hint.off{visibility:hidden}
+.vill-hint.red{color:rgba(200,50,50,.5)}
+.vill-hint.red:hover{color:rgba(200,50,50,.9)}
 
-        // ── COLE AQUI AS SUAS CREDENCIAIS DO FIREBASE ──────────────────
-        const firebaseConfig = {
-            apiKey:            "COLE_AQUI",
-            authDomain:        "COLE_AQUI",
-            databaseURL:       "COLE_AQUI",   // ← obrigatório: https://SEU_PROJETO-default-rtdb.firebaseio.com
-            projectId:         "COLE_AQUI",
-            storageBucket:     "COLE_AQUI",
-            messagingSenderId: "COLE_AQUI",
-            appId:             "COLE_AQUI"
-        };
-        // ────────────────────────────────────────────────────────────────
+/* choice buttons */
+.choice-row{display:flex;gap:.75rem;margin-top:1rem;width:100%}
+.choice-btn{font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;padding:.65rem 1rem;border-radius:8px;cursor:pointer;transition:.2s;flex:1}
+.choice-btn.refuse{background:rgba(200,70,70,.15);border:1px solid rgba(200,70,70,.5);color:#d08080}
+.choice-btn.refuse:hover{background:rgba(200,70,70,.3)}
+.choice-btn.give{background:rgba(100,200,130,.1);border:1px solid rgba(100,200,130,.4);color:#7dd9a0}
+.choice-btn.give:hover{background:rgba(100,200,130,.22)}
 
-        const app = initializeApp(firebaseConfig);
-        const db  = getDatabase(app);
+/* RISING STARS for threat */
+.rising-star{position:fixed;pointer-events:none;z-index:8000;font-size:18px;animation:riseStar var(--rs-d,1.8s) ease-in forwards var(--rs-dl,0s)}
+@keyframes riseStar{0%{opacity:0;transform:translateY(0) scale(.5)}20%{opacity:1}100%{opacity:0;transform:translateY(-120vh) scale(1.2)}}
+/* RED LETTERS pulsing */
+@keyframes redPulse{0%,100%{color:#ff2222;text-shadow:0 0 10px rgba(255,0,0,.5)}50%{color:#ff6666;text-shadow:0 0 28px rgba(255,0,0,.9)}}
+.txt-threat{animation:redPulse 1s ease-in-out infinite}
+/* Dread hint — bad feeling text */
+.dread-box{background:rgba(80,20,20,.45);border:1px solid rgba(200,50,50,.3);border-radius:9px;padding:.55rem 1rem;max-width:480px;width:100%;margin-bottom:.5rem;text-align:center}
+.dread-txt{font-family:'Cinzel',serif;font-size:12px;letter-spacing:1px;color:#b06060;font-style:italic;animation:dreadPulse 2.5s ease-in-out infinite}
+@keyframes dreadPulse{0%,100%{opacity:.6}50%{opacity:1}}
 
-        // Expõe para o código global (não-modular)
-        window._fb = {
-            db,
-            ref: (path)           => ref(db, path),
-            set: (r, v)           => set(r, v),
-            get: (r)              => get(r),
-            update: (r, v)        => update(r, v),
-            onValue,
-            remove: (r)           => remove(r),
-            push: (r, v)          => push(r, v),
-            child
-        };
-        window._fbReady = true;
-        document.dispatchEvent(new Event("firebase-ready"));
-    </script>
+/* BOSS BATTLE */
+#boss-screen{background:#08000a;justify-content:center}
+.boss-bg-red{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,rgba(180,0,0,.18) 0%,transparent 70%);pointer-events:none}
+.boss-stars{position:absolute;inset:0;pointer-events:none}
+.boss-star{position:absolute;background:#ff4444;border-radius:50%;animation:bsw var(--d,2s) ease-in-out infinite var(--dl,0s)}
+@keyframes bsw{0%{opacity:.1;transform:translateY(0)}50%{opacity:.8;transform:translateY(-20px)}100%{opacity:.1;transform:translateY(0)}}
+.boss-icon{font-size:72px;margin-bottom:.5rem;animation:bossFloat 2s ease-in-out infinite,bossGlow 1.5s ease-in-out infinite}
+@keyframes bossFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes bossGlow{0%,100%{filter:drop-shadow(0 0 8px rgba(200,0,0,.4))}50%{filter:drop-shadow(0 0 22px rgba(200,0,0,.9))}}
+.boss-title{font-family:'Cinzel',serif;font-size:22px;color:#ff4444;text-shadow:0 0 20px rgba(255,0,0,.6);margin-bottom:.3rem}
+.boss-sub{font-size:14px;color:#8a5050;font-style:italic;margin-bottom:1rem;max-width:420px}
+.boss-lives-row{display:flex;align-items:center;justify-content:center;gap:.4rem;margin-bottom:1rem;font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;color:#c05050;text-transform:uppercase}
+.boss-hrt{font-size:22px;transition:.4s}
+.boss-hrt.gone{opacity:.12;filter:grayscale(1)}
+.boss-action{background:rgba(200,30,30,.15);border:1px solid rgba(200,30,30,.4);border-radius:10px;padding:.9rem 1.1rem;max-width:420px;width:100%;margin:.4rem 0;text-align:center}
+.boss-action-txt{font-family:'Cinzel',serif;font-size:14px;color:#ff6060;margin-bottom:.3rem}
+.boss-action-sub{font-size:12px;color:#6a4040;line-height:1.5}
+.boss-btn{font-family:'Cinzel',serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;padding:.65rem 1.5rem;background:rgba(200,30,30,.2);border:2px solid rgba(200,30,30,.5);color:#ff6060;border-radius:8px;cursor:pointer;transition:.2s;margin-top:.75rem;width:100%;max-width:320px}
+.boss-btn:hover{background:rgba(200,30,30,.35)}
+@keyframes loseHeart{0%{transform:scale(1)}50%{transform:scale(1.4);filter:drop-shadow(0 0 12px red)}100%{transform:scale(.8);opacity:.12;filter:grayscale(1)}}
+.losing{animation:loseHeart .6s ease forwards}
 
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+/* ── CRACK SCREEN ── */
+#crack-overlay{position:fixed;inset:0;z-index:99999;pointer-events:none;overflow:hidden;display:none;}
+.crack-svg{position:absolute;inset:0;width:100%;height:100%;}
+@keyframes crackAppear{0%{opacity:0}100%{opacity:1}}
+@keyframes screenShake{0%,100%{transform:translate(0,0)}10%{transform:translate(-8px,4px)}20%{transform:translate(8px,-6px)}30%{transform:translate(-6px,8px)}40%{transform:translate(9px,-4px)}50%{transform:translate(-7px,6px)}60%{transform:translate(8px,-8px)}70%{transform:translate(-5px,5px)}80%{transform:translate(6px,-3px)}90%{transform:translate(-4px,7px)}}
+@keyframes fadeToDark{0%{opacity:0}100%{opacity:1}}
+@keyframes fadeToBlue{0%{background:#0a0a14}100%{background:#a8d8ea}}
+.crack-line{stroke:#fff;stroke-width:2;fill:none;filter:drop-shadow(0 0 6px #fff);animation:crackAppear .18s ease forwards;opacity:0;}
 
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f0f8ff;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 20px;
-            user-select: none;
-        }
+/* ── OLD SAGE SCREEN ── */
+#sage-screen{background:linear-gradient(180deg,#a8d8ea 0%,#c5e8f5 40%,#d8f0fa 100%);justify-content:flex-end;padding-bottom:2.25rem}
+.sage-clouds{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.sage-cloud{position:absolute;background:rgba(255,255,255,.7);border-radius:50px;filter:blur(8px);animation:cloudDrift var(--cd,18s) ease-in-out infinite var(--cdl,0s)}
+@keyframes cloudDrift{0%,100%{transform:translateX(0)}50%{transform:translateX(30px)}}
+.sage-bg-icon{position:absolute;top:30%;left:50%;transform:translate(-50%,-50%);font-size:140px;opacity:.18;pointer-events:none;animation:sageBob 4s ease-in-out infinite}
+@keyframes sageBob{0%,100%{transform:translate(-50%,-50%)}50%{transform:translate(-50%,-58%)}}
+.sage-box{background:rgba(255,255,255,.82);border:2px solid rgba(140,200,230,.7);border-radius:16px;padding:1.5rem 1.8rem;max-width:520px;width:100%;backdrop-filter:blur(6px);box-shadow:0 8px 40px rgba(100,180,220,.25)}
+.sage-voice-tag{font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#3a8ab0;margin-bottom:.65rem;display:flex;align-items:center;gap:.5rem}
+.vpulse-sage{width:8px;height:8px;border-radius:50%;background:#3a8ab0;animation:pulse 1.4s ease-in-out infinite;flex-shrink:0}
+.sage-txt{font-size:16px;line-height:1.85;color:#1a4a60;min-height:56px;text-align:left}
+.sage-hint{font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(58,138,176,.5);margin-top:.85rem;cursor:pointer;transition:color .3s}
+.sage-hint:hover{color:rgba(58,138,176,.9)}
+.sage-hint.off{visibility:hidden}
 
-        .game-container {
-            background-color: white;
-            border-radius: 15px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-            width: 90%;
-            max-width: 720px;
-            padding: 25px;
-            text-align: center;
-            margin: auto;
-        }
-
-        .hidden { display: none !important; }
-
-        /* AVATAR */
-        .avatar-grid {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 10px;
-            margin: 20px 0;
-        }
-        @media (max-width: 480px) { .avatar-grid { grid-template-columns: repeat(4, 1fr); } }
-        .avatar-option {
-            font-size: 2.2rem;
-            padding: 8px;
-            border: 3px solid transparent;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: transform 0.2s, border-color 0.2s;
-        }
-        .avatar-option:hover { transform: scale(1.1); }
-        .avatar-option.selected { border-color: #4caf50; background-color: #e8f5e9; }
-
-        input[type="text"] {
-            width: 80%;
-            padding: 12px;
-            font-size: 1rem;
-            border: 2px solid #ccc;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-        input[type="text"]:focus { border-color: #2196f3; }
-
-        .btn {
-            background-color: #4caf50;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            font-size: 1.1rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.2s;
-            margin: 5px;
-        }
-        .btn:hover { background-color: #45a049; }
-        .btn-admin  { background-color: #9c27b0; }
-        .btn-admin:hover  { background-color: #7b1fa2; }
-        .btn-danger { background-color: #f44336; }
-        .btn-danger:hover { background-color: #d32f2f; }
-        .btn-orange { background-color: #ff9800; }
-        .btn-orange:hover { background-color: #f57c00; }
-        .btn-blue   { background-color: #2196f3; }
-        .btn-blue:hover   { background-color: #1976d2; }
-        .btn:disabled { opacity: 0.45; cursor: not-allowed; }
-
-        /* LOBBY */
-        .players-list {
-            background: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 15px;
-            max-height: 220px;
-            overflow-y: auto;
-            text-align: left;
-            margin: 15px 0;
-        }
-        .player-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1rem;
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
-        }
-        .player-item:last-child { border-bottom: none; }
-
-        /* MASCOTE */
-        .mascot-container {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            background-color: #e1f5fe;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        .mascot { font-size: 3rem; animation: bounce 2s infinite; }
-        .speech-bubble { background: white; padding: 10px 15px; border-radius: 8px; border: 1px solid #b3e5fc; flex: 1; }
-
-        /* GAME HEADER */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 1.1rem;
-            font-weight: bold;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        #timer-display { color: #ff4757; }
-
-        /* OPÇÕES */
-        .options-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 12px;
-            margin-top: 20px;
-        }
-        .option-btn {
-            background-color: #2196f3;
-            color: white;
-            border: none;
-            padding: 15px;
-            font-size: 1.05rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.2s, transform 0.1s;
-            font-weight: bold;
-            text-align: center;
-        }
-        .option-btn:hover:not(:disabled) { background-color: #0b7dda; transform: translateY(-2px); }
-        .option-btn.correct  { background-color: #4caf50 !important; transform: none; }
-        .option-btn.wrong    { background-color: #f44336 !important; transform: none; }
-        .option-btn:disabled { cursor: default; }
-        .option-btn.selected-answer { background-color: #78909c !important; transform: none; }
-
-        /* TELA TRAVADA */
-        .lock-screen {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            background: rgba(0,0,0,0.85);
-            color: white;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            text-align: center;
-            padding: 20px;
-        }
-        .lock-screen .spinner { font-size: 4rem; animation: spin 2s infinite linear; margin-bottom: 15px; }
-
-        /* PAINEL DO PROFESSOR */
-        .admin-panel { text-align: left; }
-        .admin-panel h2 { text-align: center; margin-bottom: 8px; }
-        .admin-panel p  { text-align: center; color: #666; margin-bottom: 15px; }
-
-        .progress-bar-bg  { background: #eee; border-radius: 20px; height: 10px; margin: 8px 0; overflow: hidden; }
-        .progress-bar-fill{ height: 100%; background: #2196f3; border-radius: 20px; transition: width 0.4s; }
-
-        .phase-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        .badge-mat { background: #e3f2fd; color: #0d47a1; }
-        .badge-por { background: #ede7f6; color: #4527a0; }
-        .badge-cie { background: #e8f5e9; color: #1b5e20; }
-        .badge-his { background: #fff8e1; color: #e65100; }
-        .badge-geo { background: #fce4ec; color: #880e4f; }
-
-        .answer-reveal-box {
-            background: #e8f5e9;
-            border: 2px solid #4caf50;
-            border-radius: 8px;
-            padding: 14px 18px;
-            margin: 12px 0;
-            color: #1b5e20;
-            font-size: 1rem;
-            font-weight: bold;
-        }
-
-        .admin-controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 12px; }
-        .answered-info  { font-size: 0.9rem; color: #555; margin-top: 6px; }
-
-        .admin-option-list { list-style: none; margin: 10px 0; }
-        .admin-option-list li {
-            padding: 10px 14px;
-            border-radius: 8px;
-            background: #f5f5f5;
-            margin-bottom: 8px;
-            font-size: 1rem;
-            border: 2px solid transparent;
-            transition: border-color 0.2s;
-        }
-        .admin-option-list li.correct { background: #e8f5e9; border-color: #4caf50; color: #1b5e20; font-weight: bold; }
-
-        .nav-tabs { display: flex; gap: 4px; margin-bottom: 16px; justify-content: center; }
-        .nav-tab {
-            padding: 8px 18px;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            background: transparent;
-            color: #555;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: bold;
-            transition: background 0.15s;
-        }
-        .nav-tab.active { background: #2196f3; color: white; border-color: #2196f3; }
-
-        .score-rank { font-size: 1.1rem; padding: 10px 0; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px; }
-        .score-rank:last-child { border-bottom: none; }
-
-        .timer-admin  { font-size: 2rem; font-weight: bold; color: #f44336; display: inline-block; min-width: 50px; }
-        .timer-bar-bg { background: #eee; border-radius: 20px; height: 12px; overflow: hidden; margin: 6px 0 14px; }
-        .timer-bar-fill { height: 100%; background: #f44336; border-radius: 20px; transition: width 1s linear; }
-
-        .info-box { background: #fff3e0; border: 1px solid #ffb74d; border-radius: 8px; padding: 12px 16px; font-size: 0.9rem; color: #e65100; margin-bottom: 15px; text-align: left; line-height: 1.7; }
-
-        #score-display { color: #4caf50; font-weight: bold; }
-
-        /* LOCK SCREEN RICO */
-        .lock-result-box {
-            margin: 16px auto 0;
-            max-width: 340px;
-            border-radius: 16px;
-            padding: 20px 22px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            animation: popInLock 0.5s cubic-bezier(0.175,0.885,0.32,1.275) forwards;
-        }
-        @keyframes popInLock {
-            from { opacity:0; transform: scale(0.7); }
-            to   { opacity:1; transform: scale(1); }
-        }
-        .lock-result-box.acertou { background: linear-gradient(135deg,#43e97b,#38f9d7); color:#064e1a; border:2px solid #2ecc71; }
-        .lock-result-box.errou   { background: linear-gradient(135deg,#f7971e,#ffd200); color:#5a2d00; border:2px solid #f39c12; }
-        .lock-result-box.tempo   { background: linear-gradient(135deg,#bdc3c7,#95a5a6); color:#2c3e50; border:2px solid #7f8c8d; }
-        .lock-result-emoji { font-size:3rem; display:block; margin-bottom:8px; }
-        .lock-result-msg   { font-size:1rem; font-weight:normal; margin-top:6px; line-height:1.5; }
-        .lock-pts-gained   { font-size:1.4rem; margin-top:8px; display:block; }
-        .lock-ranking-box  { margin-top:14px; background:rgba(255,255,255,0.35); border-radius:10px; padding:10px 16px; font-size:0.95rem; font-weight:bold; }
-        .lock-ranking-pos  { font-size:1.6rem; }
-
-        /* BARRA DE % */
-        .pct-bar-wrap { margin:6px 0 2px; }
-        .pct-bar-row  { display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:0.88rem; }
-        .pct-bar-label{ min-width:120px; max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#444; }
-        .pct-bar-bg   { flex:1; background:#e0e0e0; border-radius:20px; height:14px; overflow:hidden; }
-        .pct-bar-fill { height:100%; border-radius:20px; background:#2196f3; transition:width 0.5s ease; }
-        .pct-bar-fill.correct-bar { background:#4caf50; }
-        .pct-num      { min-width:36px; text-align:right; font-weight:bold; color:#333; font-size:0.85rem; }
-
-        /* OVERLAY SUSPENSE 1º */
-        #suspense-overlay {
-            display:none; position:fixed; inset:0; background:#000;
-            z-index:8000; overflow:hidden;
-            flex-direction:column; align-items:center; justify-content:center;
-            text-align:center;
-        }
-        #suspense-overlay.ativo { display:flex; }
-        .luz { position:absolute; border-radius:50%; filter:blur(60px); opacity:0; animation:piscarLuz 0.4s infinite alternate; pointer-events:none; }
-        .luz-1 { width:300px; height:300px; background:#ff0040; top:-60px;   left:-60px;   animation-delay:0s; }
-        .luz-2 { width:250px; height:250px; background:#ffd700; top:-40px;   right:-40px;  animation-delay:.15s; }
-        .luz-3 { width:280px; height:280px; background:#00eaff; bottom:-60px; left:20px;   animation-delay:.3s; }
-        .luz-4 { width:260px; height:260px; background:#bf00ff; bottom:-40px; right:-20px; animation-delay:.05s; }
-        .luz-5 { width:200px; height:200px; background:#ff8c00; top:50%; left:50%; transform:translate(-50%,-50%); animation-delay:.2s; }
-        @keyframes piscarLuz { 0%{opacity:0} 100%{opacity:.75} }
-
-        .tambores-wrap { position:relative; z-index:1; display:flex; gap:18px; margin-bottom:20px; }
-        .tambor { font-size:3.5rem; animation:baterTambor 0.3s infinite alternate; display:inline-block; }
-        .tambor:nth-child(2) { animation-delay:.15s; }
-        .tambor:nth-child(3) { animation-delay:.07s; }
-        @keyframes baterTambor { 0%{transform:translateY(0) scale(1)} 100%{transform:translateY(-10px) scale(1.12)} }
-
-        .suspense-titulo { position:relative; z-index:1; font-size:2rem; font-weight:900; color:#fff;
-            text-shadow:0 0 20px #ffd700,0 0 40px #ffd700; letter-spacing:3px;
-            animation:pulseTxt 0.5s infinite alternate; margin-bottom:10px; }
-        @keyframes pulseTxt { 0%{transform:scale(1);text-shadow:0 0 10px #ffd700} 100%{transform:scale(1.06);text-shadow:0 0 40px #fff700,0 0 80px #ff8800} }
-
-        .suspense-reticencias { position:relative; z-index:1; font-size:3rem; color:#ffd700; letter-spacing:8px; animation:fadeReticencias 0.6s infinite alternate; }
-        @keyframes fadeReticencias { 0%{opacity:.2} 100%{opacity:1} }
-
-        #reveal-nome-1 { position:relative; z-index:1; display:none; flex-direction:column; align-items:center; animation:explodeName 0.7s cubic-bezier(0.175,0.885,0.32,1.275) forwards; }
-        #reveal-nome-1.visivel { display:flex; }
-        @keyframes explodeName { 0%{opacity:0;transform:scale(.2)} 60%{transform:scale(1.15)} 100%{opacity:1;transform:scale(1)} }
-
-        .reveal-avatar-big { font-size:7rem; line-height:1; margin-bottom:8px; }
-        .reveal-nome-big   { font-size:2.8rem; font-weight:900; color:#ffd700; text-shadow:0 0 20px #ff8800,0 0 50px #ffd700; letter-spacing:2px; }
-        .reveal-pts-big    { font-size:1.4rem; color:#fff; background:rgba(255,255,255,.15); border-radius:20px; padding:6px 20px; margin-top:8px; }
-        .reveal-parabens   { font-size:1.6rem; font-weight:bold; color:#fff; margin-top:14px; animation:piscarParabens .5s infinite alternate; }
-        @keyframes piscarParabens { 0%{opacity:.6;color:#ffd700} 100%{opacity:1;color:#fff} }
-
-        #btn-fechar-suspense {
-            position:relative; z-index:1; display:none; margin-top:22px;
-            background:linear-gradient(135deg,#ffd700,#ff8800); color:#000; border:none;
-            padding:14px 36px; font-size:1.1rem; border-radius:30px; cursor:pointer;
-            font-weight:900; letter-spacing:1px; box-shadow:0 4px 20px rgba(255,215,0,.5);
-            animation:pulseBtnFechar 1s infinite alternate;
-        }
-        @keyframes pulseBtnFechar { 0%{box-shadow:0 4px 20px rgba(255,215,0,.4)} 100%{box-shadow:0 6px 40px rgba(255,215,0,.9)} }
-
-        @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-        @keyframes spin   { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
-
-        /* FIM / PÓDIO */
-        #screen-end { text-align:center; }
-        #confetti-canvas { position:fixed; top:0; left:0; width:100vw; height:100vh; pointer-events:none; z-index:9999; }
-
-        .suspense-card { display:none; flex-direction:column; align-items:center; justify-content:center; gap:10px; animation:popIn .6s cubic-bezier(0.175,0.885,0.32,1.275) forwards; margin:10px 0 20px; }
-        .suspense-card.active { display:flex; }
-        @keyframes popIn      { 0%{opacity:0;transform:scale(.4) translateY(40px)} 100%{opacity:1;transform:scale(1) translateY(0)} }
-        @keyframes fadeSlideIn{ 0%{opacity:0;transform:translateY(30px)} 100%{opacity:1;transform:translateY(0)} }
-        @keyframes shimmer    { 0%,100%{text-shadow:0 0 8px #ffd700,0 0 20px #ffd700} 50%{text-shadow:0 0 20px #fff200,0 0 40px #ffaa00} }
-
-        .suspense-medal { font-size:3.5rem; line-height:1; }
-        .suspense-avatar{ font-size:5rem; line-height:1; }
-        .suspense-name  { font-size:1.8rem; font-weight:bold; color:#1a237e; margin:4px 0; }
-        .suspense-pts   { font-size:1.2rem; color:#555; background:#f5f5f5; border-radius:20px; padding:4px 18px; }
-        .suspense-1st .suspense-name  { font-size:2.2rem; color:#e65100; animation:shimmer 1.5s infinite; }
-        .suspense-1st .suspense-avatar{ font-size:6rem; }
-        .suspense-1st .suspense-medal { font-size:4.5rem; }
-
-        .btn-suspense {
-            background:linear-gradient(135deg,#667eea,#764ba2); color:white; border:none;
-            padding:14px 34px; font-size:1.15rem; border-radius:30px; cursor:pointer;
-            font-weight:bold; letter-spacing:1px; box-shadow:0 4px 18px rgba(102,126,234,.4);
-            transition:transform .15s,box-shadow .15s; margin:8px 4px;
-        }
-        .btn-suspense:hover    { transform:translateY(-2px); box-shadow:0 6px 24px rgba(102,126,234,.5); }
-        .btn-suspense:disabled { opacity:.4; cursor:not-allowed; transform:none; }
-
-        #full-table { display:none; margin-top:20px; animation:fadeSlideIn .5s ease forwards; }
-        .table-row { display:flex; align-items:center; gap:12px; padding:10px 14px; border-radius:10px; margin-bottom:8px; background:#f9f9f9; border:1px solid #eee; text-align:left; }
-        .table-row.gold   { background:#fff8e1; border-color:#ffd54f; }
-        .table-row.silver { background:#f5f5f5; border-color:#bdbdbd; }
-        .table-row.bronze { background:#fbe9e7; border-color:#ffab91; }
-        .table-pos  { font-size:1.2rem; font-weight:bold; min-width:32px; }
-        .table-av   { font-size:1.8rem; }
-        .table-name { flex:1; font-size:1rem; font-weight:bold; color:#222; }
-        .table-pts  { font-size:.95rem; color:#555; white-space:nowrap; }
-
-        .parabens-box { background:linear-gradient(135deg,#ff9a9e,#fad0c4,#ffecd2); border-radius:16px; padding:18px 20px; margin:16px 0; font-size:1.4rem; font-weight:bold; color:#bf360c; animation:popIn .7s ease forwards; }
-        .phase-title  { font-size:1.05rem; color:#888; margin:14px 0 6px; text-transform:uppercase; letter-spacing:1px; }
-        .dots-anim    { font-size:2rem; animation:pulse 1s infinite; }
-        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
-
-        /* GUIA SETUP — sempre oculto na tela */
-        #setup-guide { display:none !important; }
-        .setup-ok    { display:none !important; }
-    </style>
+/* BOSS novo */
+.skill-btn{font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:.45rem .75rem;border-radius:8px;cursor:pointer;transition:.2s;border:2px solid;display:flex;align-items:center;gap:.35rem}
+.skill-btn.ready{background:rgba(100,200,130,.18);border-color:rgba(100,200,130,.7);color:#7dd9a0;animation:skillPulse 1.3s ease-in-out infinite}
+.skill-btn.used{background:rgba(80,80,80,.15);border-color:rgba(120,120,120,.3);color:#5a5a5a;cursor:default}
+@keyframes skillPulse{0%,100%{box-shadow:0 0 6px rgba(100,200,130,.3)}50%{box-shadow:0 0 18px rgba(100,200,130,.8)}}
+.combo-pip{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px}
+.combo-pips{display:flex;gap:3px}
+.pip{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);transition:.3s}
+.pip.lit{background:#f0d980;border-color:#c8a84b;box-shadow:0 0 5px rgba(200,168,75,.6)}
+.combo-lbl{font-family:'Cinzel',serif;font-size:8px;letter-spacing:1px;color:#5a5040;text-transform:uppercase}
+.boss-opt{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:.5rem .65rem;color:#b8b0a0;cursor:pointer;font-family:'Nunito',sans-serif;font-size:13px;font-weight:600;transition:.2s;text-align:left;line-height:1.3}
+.boss-opt:hover:not(:disabled){background:rgba(200,168,75,.12);border-color:rgba(200,168,75,.45);color:#f0d980}
+.boss-opt.ok{background:rgba(100,200,130,.12);border-color:rgba(100,200,130,.5);color:#7dd9a0}
+.boss-opt.no{background:rgba(200,70,70,.1);border-color:rgba(200,70,70,.4);color:#d08080}
+@keyframes dmgFlash{0%{background:rgba(200,0,0,.35)}100%{background:transparent}}
+.dmg-flash{animation:dmgFlash .5s ease}
+@keyframes healFlash{0%{background:rgba(100,200,130,.3)}100%{background:transparent}}
+.heal-flash{animation:healFlash .5s ease}
+</style>
 </head>
 <body>
-<div class="game-container">
+<div id="gr">
+  <div class="stars-bg" id="sb"></div>
 
-    <!-- ===== GUIA DE CONFIGURAÇÃO (some após conectar) ===== -->
-    <div id="setup-guide">
-        <h3>⚙️ Guia de Configuração do Firebase (único passo necessário)</h3>
-        <ol>
-            <li>Acesse <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a> e faça login com sua conta Google.</li>
-            <li>Clique em <b>"Criar um projeto"</b>, dê um nome (ex: <code>quiz-sala</code>) e conclua.</li>
-            <li>No menu lateral, clique em <b>"Realtime Database"</b> → <b>"Criar banco de dados"</b>.<br>
-                Escolha qualquer região → selecione <b>"Iniciar no modo de teste"</b> → Ativar.</li>
-            <li>No menu lateral, vá em <b>"Configurações do projeto"</b> (ícone ⚙️) → aba <b>"Geral"</b>.<br>
-                Em "Seus aplicativos", clique em <b>"&lt;/&gt;"</b> (Web), registre um nome e copie o objeto <code>firebaseConfig</code>.</li>
-            <li>Abra este arquivo HTML num editor de texto, localize o bloco <code>const firebaseConfig = {</code> e substitua cada <code>"COLE_AQUI"</code> pelo valor correspondente.</li>
-            <li>Salve e abra o arquivo no navegador — a mensagem abaixo vai sumir e o jogo vai funcionar em qualquer dispositivo!</li>
-        </ol>
+  <!-- NOME -->
+  <div class="screen" id="name-screen">
+    <div class="badge">✦ Módulo 1 — A Jornada ✦</div>
+    <h1 class="big-title">Os Elementos do Saber</h1>
+    <div class="sub">Uma missão para mentes corajosas do 5º ano!</div>
+    <div class="divider"></div>
+    <div class="name-wrap">
+      <label class="lbl" for="inp-name">Como você se chama?</label>
+      <input class="ninput" id="inp-name" type="text" placeholder="Seu nome..." maxlength="18" autocomplete="off">
+      <button class="btn" id="btn-av">Escolher Avatar →</button>
     </div>
-    <div class="setup-ok" id="setup-ok">✅ Firebase conectado! O jogo está pronto para usar em qualquer dispositivo da mesma rede (ou internet).</div>
+  </div>
 
-    <!-- ===== TELA: LOGIN ALUNO ===== -->
-    <div id="screen-login">
-        <h2>🎮 Bem-vindo ao Jogo!</h2>
-        <p style="color:#666; margin:8px 0 16px;">Escolha seu Avatar:</p>
-        <div class="avatar-grid">
-            <span class="avatar-option selected" onclick="selectAvatar(this,'🦊')">🦊</span>
-            <span class="avatar-option" onclick="selectAvatar(this,'🐵')">🐵</span>
-            <span class="avatar-option" onclick="selectAvatar(this,'🐸')">🐸</span>
-            <span class="avatar-option" onclick="selectAvatar(this,'🦄')">🦄</span>
-            <span class="avatar-option" onclick="selectAvatar(this,'🦁')">🦁</span>
-            <span class="avatar-option" onclick="selectAvatar(this,'🐷')">🐷</span>
-            <span class="avatar-option" onclick="selectAvatar(this,'🐼')">🐼</span>
-            <span class="avatar-option" onclick="selectAvatar(this,'🐻')">🐻</span>
-            <span class="avatar-option" onclick="selectAvatar(this,'🐨')">🐨</span>
-            <span class="avatar-option" onclick="selectAvatar(this,'🐙')">🐙</span>
-            <span class="avatar-option" onclick="selectAvatar(this,'🦖')">🦖</span>
-            <span class="avatar-option" onclick="selectAvatar(this,'🐝')">🐝</span>
+  <!-- AVATAR -->
+  <div class="screen off" id="avatar-screen">
+    <div class="badge">✦ Módulo 1 — A Jornada ✦</div>
+    <h2 class="big-title" style="font-size:20px">Qual é o seu avatar?</h2>
+    <div class="sub">Cada um tem um talento especial!</div>
+    <div class="avatar-grid">
+      <div class="av-card" data-av="Detetive" data-ic="🔍"><span class="av-emoji">🔍</span><div class="av-name">Detetive</div><div class="av-tip">Adora pistas</div></div>
+      <div class="av-card" data-av="Cientista" data-ic="🧪"><span class="av-emoji">🧪</span><div class="av-name">Cientista</div><div class="av-tip">Faz experimentos</div></div>
+      <div class="av-card" data-av="Explorador" data-ic="🌎"><span class="av-emoji">🌎</span><div class="av-name">Explorador</div><div class="av-tip">Descobre o mundo</div></div>
+      <div class="av-card" data-av="Artista" data-ic="🎨"><span class="av-emoji">🎨</span><div class="av-name">Artista</div><div class="av-tip">Cria e imagina</div></div>
+      <div class="av-card" data-av="Inventor" data-ic="💡"><span class="av-emoji">💡</span><div class="av-name">Inventor</div><div class="av-tip">Tem ideias incríveis</div></div>
+      <div class="av-card" data-av="Leitor" data-ic="📚"><span class="av-emoji">📚</span><div class="av-name">Leitor</div><div class="av-tip">Conhece mil histórias</div></div>
+    </div>
+    <button class="btn go" id="btn-story">Começar a aventura! →</button>
+  </div>
+
+  <!-- INTRO NARRAÇÃO -->
+  <div class="screen off" id="intro-screen">
+    <button class="skip-btn" onclick="skipIntro()" title="Pular narração">⏭ Pular</button>
+    <div class="scene-bg" id="scene-e">📜</div>
+    <div id="prof-intro"></div>
+    <div class="nar-box">
+      <div class="voice-tag">
+        <span class="vpulse"></span> Voz Ancestral
+        <button class="voice-btn" onclick="speakNar()">🔊 Ouvir</button>
+      </div>
+      <div class="nar-txt" id="nar-txt"></div>
+      <div class="cnt-hint off" id="cnt-hint" onclick="nextNar()">[ toque para continuar ]</div>
+    </div>
+  </div>
+
+  <!-- MAPA -->
+  <div class="screen off" id="map-screen">
+    <div id="prof-map"></div>
+    <div class="global-lives" id="global-lives-map"></div>
+    <div class="inv-bar" id="inv-bar">
+      <span class="inv-label">Itens:</span>
+      <span id="inv-empty" style="color:#5a5040;font-size:12px;font-style:italic">nenhum ainda...</span>
+    </div>
+    <div class="badge" style="margin-bottom:.2rem">✦ Módulo 2 — As 5 Matérias do 5º Ano ✦</div>
+    <div class="map-title">Elementos do Saber</div>
+    <div class="map-sub">5 questões embaralhadas por elemento!</div>
+    <div class="mod-divider"><div class="mod-line"></div><div class="mod-label">mapa da missão</div><div class="mod-line"></div></div>
+    <div class="elems-grid" id="eg"></div>
+    <div class="sc-tag" id="sc-tag">Recuperados: 0 / 5</div>
+    <div id="advance-wrap" style="width:100%;max-width:480px"></div>
+  </div>
+
+  <!-- DESAFIO -->
+  <div class="screen off" id="ch-screen">
+    <div class="ch-icon" id="ch-ic"></div>
+    <div class="ch-title" id="ch-tit"></div>
+    <div class="ch-desc" id="ch-desc"></div>
+    <div class="rule-tag">⚠ 5 questões embaralhadas · pode errar 1 · passe perfeito = +1 vida</div>
+    <div class="global-lives" id="global-lives-ch"></div>
+    <div class="phase-lives" id="phase-lives"></div>
+    <div class="prog-wrap">
+      <span class="prog-lbl" id="plbl">1 / 5</span>
+      <div class="prog-bar"><div class="prog-fill" id="pfill" style="width:20%"></div></div>
+    </div>
+    <div class="ch-nar-box">
+      <div class="ch-nar-txt" id="ch-nar-txt">…</div>
+      <button class="ch-voice-btn" id="ch-voice-btn" title="Ouvir narração">🔊</button>
+    </div>
+    <div class="q-box" id="q-box">
+      <div class="q-txt">
+        <button class="q-speak" id="q-speak-btn" title="Ouvir pergunta">🔊</button>
+        <span id="qtxt"></span>
+      </div>
+      <div class="opts" id="og"></div>
+      <div class="fb" id="fb"></div>
+    </div>
+    <div class="fail-box off" id="fail-box">
+      <div class="fail-title">😢 Elemento não recuperado...</div>
+      <div class="fail-sub" id="fail-sub"></div>
+    </div>
+    <button class="back-lnk" id="back-btn" onclick="goMap()">← Voltar ao mapa</button>
+  </div>
+
+  <!-- VITÓRIA -->
+  <div class="screen off" id="vic-screen">
+    <div class="vic-icon">🏆</div>
+    <div class="vic-title">O Saber foi restaurado!</div>
+    <div class="vic-sub" id="vic-sub"></div>
+    <div class="vic-inv" id="vic-inv"></div>
+    <div class="vic-score" id="vic-score"></div>
+    <button class="btn go" onclick="restart()">✦ Jogar de novo ✦</button>
+  </div>
+
+  <!-- DERROTA -->
+  <div class="screen off" id="dead-screen">
+    <div class="dead-icon">💀</div>
+    <div class="dead-title">Você foi derrotado!</div>
+    <div class="dead-sub" id="dead-sub"></div>
+    <div class="dead-score" id="dead-score"></div>
+    <button class="btn danger" onclick="restart()" style="max-width:320px">⚔ Tentar novamente ⚔</button>
+  </div>
+
+  <!-- CENA DO VILÃO (3 atos) -->
+  <div class="screen off" id="villain-screen">
+    <button class="skip-btn" onclick="skipVillain()" title="Pular para o Boss">⏭ Pular</button>
+    <div class="vill-scene-bg" id="vill-bg">🌑</div>
+    <div id="vill-prof"></div>
+    <div class="vill-box" id="vill-box">
+      <div class="vill-voice-tag good" id="vill-tag">
+        <span class="vpulse-vill good" id="vill-pulse"></span>
+        <span id="vill-tag-name">Voz Ancestral</span>
+        <button class="voice-btn" onclick="speakVill()" style="margin-left:auto">🔊 Ouvir</button>
+      </div>
+      <div class="vill-txt good" id="vill-txt"></div>
+      <div id="choice-area"></div>
+      <div class="vill-hint off" id="vill-hint" onclick="villNext()">[ toque para continuar ]</div>
+    </div>
+  </div>
+
+  <!-- BOSS BATTLE (novo sistema de questões + habilidades) -->
+  <div class="screen off" id="boss-screen">
+    <div class="boss-bg-red"></div>
+    <div class="boss-stars" id="boss-stars"></div>
+
+    <!-- Topo: info do boss -->
+    <div style="position:relative;z-index:2;width:100%;max-width:500px;padding:.5rem 1rem 0">
+      <!-- Barra de vida do boss -->
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.3rem">
+        <span style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;color:#c05050;text-transform:uppercase;white-space:nowrap">💀 Boss HP</span>
+        <div style="flex:1;height:14px;background:rgba(255,255,255,.07);border-radius:7px;overflow:hidden;border:1px solid rgba(200,30,30,.3)">
+          <div id="boss-hp-fill" style="height:100%;background:linear-gradient(90deg,#c00,#ff4444);border-radius:7px;transition:width .7s ease;width:100%"></div>
         </div>
-        <input type="text" id="player-name" placeholder="Digite seu nome aqui..." maxlength="15"><br>
-        <button class="btn" onclick="enterLobby()">Entrar na Sala</button>
-        <br>
-        <button class="btn btn-admin" onclick="openAdminAuth()">🎓 Painel do Professor</button>
+        <span id="boss-hp-txt" style="font-family:'Cinzel',serif;font-size:11px;color:#ff6060;min-width:2.5rem;text-align:right">5/5</span>
+      </div>
+      <!-- Fala do boss -->
+      <div id="boss-speech" style="background:rgba(120,0,0,.22);border:1px solid rgba(200,30,30,.35);border-radius:9px;padding:.4rem .85rem;font-family:'Cinzel',serif;font-size:12px;color:#ff8080;min-height:28px;margin-bottom:.3rem;text-align:center;font-style:italic;letter-spacing:.5px"></div>
+      <!-- Vidas do jogador -->
+      <div class="boss-lives-row" id="boss-lives-row" style="margin-bottom:.3rem"></div>
+      <!-- Timer -->
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.3rem">
+        <span style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;color:#c8a84b;text-transform:uppercase">⏱ Tempo</span>
+        <div style="flex:1;height:8px;background:rgba(255,255,255,.07);border-radius:4px;overflow:hidden">
+          <div id="boss-timer-fill" style="height:100%;background:#c8a84b;border-radius:4px;transition:width .25s linear;width:100%"></div>
+        </div>
+        <span id="boss-timer-txt" style="font-family:'Cinzel',serif;font-size:13px;color:#f0d980;min-width:2rem;text-align:right">60</span>
+      </div>
     </div>
 
-    <!-- ===== TELA: LOBBY ALUNO ===== -->
-    <div id="screen-lobby" class="hidden">
-        <h2>⏳ Aguardando o Professor...</h2>
-        <p style="color:#666;">Você entrou na sala! Aguarde o professor iniciar o jogo.</p>
-        <div class="mascot-container">
-            <div class="mascot">💤</div>
-            <div class="speech-bubble">Estou preparando as perguntas, logo o jogo começa!</div>
-        </div>
-        <h3>Colegas na sala:</h3>
-        <div class="players-list" id="lobby-players-list"></div>
+    <!-- Habilidades desbloqueadas -->
+    <div id="boss-skills-row" style="position:relative;z-index:2;display:flex;gap:.4rem;flex-wrap:wrap;justify-content:center;width:100%;max-width:500px;padding:0 1rem;margin-bottom:.35rem"></div>
+
+    <!-- Progresso de combo por matéria -->
+    <div id="boss-combo-row" style="position:relative;z-index:2;display:flex;gap:.4rem;justify-content:center;width:100%;max-width:500px;padding:0 1rem;margin-bottom:.35rem;flex-wrap:wrap"></div>
+
+    <!-- Questão -->
+    <div id="boss-q-box" style="position:relative;z-index:2;background:rgba(255,255,255,.04);border:1px solid rgba(200,168,75,.18);border-radius:12px;padding:.7rem .9rem;max-width:480px;width:100%;margin:0 1rem .35rem">
+      <div style="display:flex;align-items:flex-start;gap:.4rem;margin-bottom:.6rem">
+        <span id="boss-q-subj" style="font-size:18px;flex-shrink:0"></span>
+        <span id="boss-q-txt" style="font-size:14px;color:#e0d8c8;line-height:1.5;flex:1"></span>
+      </div>
+      <div id="boss-opts" style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem"></div>
+      <div id="boss-fb" style="font-size:11px;padding:.4rem .7rem;border-radius:7px;margin-top:.4rem;display:none;line-height:1.4"></div>
     </div>
 
-    <!-- ===== TELA: PAINEL DO PROFESSOR ===== -->
-    <div id="screen-admin" class="hidden admin-panel">
-        <header style="justify-content:flex-end; margin-bottom:0;">
-            <button id="btn-mute-admin" onclick="toggleMuteAdmin()" style="background:none;border:1px solid #ddd;border-radius:8px;padding:4px 10px;cursor:pointer;font-size:.9rem;">🔊 Som on</button>
-        </header>
-        <h2>🎓 Painel do Professor</h2>
-        <p>Controle o quiz manualmente — você decide quando revelar a resposta e avançar.</p>
+    <!-- Botão habilidade (aparece quando ativável) -->
+    <div id="boss-skill-area" style="position:relative;z-index:2;width:100%;max-width:480px;padding:0 1rem"></div>
+  </div>
 
-        <div id="admin-lobby-view">
-            <div class="info-box">
-                ℹ️ <b>Como funciona:</b><br>
-                1. Aguarde os alunos entrarem na sala abaixo<br>
-                2. Clique em <b>Começar o Jogo</b> quando todos estiverem prontos<br>
-                3. Durante o jogo: veja a pergunta, clique em <b>Revelar Resposta</b> e depois <b>Próxima Fase</b>
-            </div>
-            <h3>Alunos Conectados:</h3>
-            <div class="players-list" id="admin-players-list-lobby"></div>
-            <div style="text-align:center; margin-top:15px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
-                <button class="btn btn-orange" onclick="clearServer()">🔄 Resetar Sala</button>
-                <button class="btn" onclick="startGame()">🚀 Começar o Jogo</button>
-            </div>
-        </div>
-
-        <div id="admin-game-view" class="hidden">
-            <div class="nav-tabs">
-                <button class="nav-tab active" onclick="adminTab('tab-q',this)">📋 Questão</button>
-                <button class="nav-tab" onclick="adminTab('tab-score',this)">🏆 Placar</button>
-                <button class="nav-tab" onclick="adminTab('tab-players',this)">👥 Alunos</button>
-            </div>
-
-            <div id="tab-q">
-                <div style="margin-bottom:10px;">
-                    <span id="admin-phase-badge" class="phase-badge badge-mat">Fase 1</span>
-                    <div class="progress-bar-bg"><div class="progress-bar-fill" id="admin-progress" style="width:4%"></div></div>
-                    <small style="color:#888;" id="admin-phase-label">Fase 1 de 25</small>
-                </div>
-                <div style="margin-bottom:12px;">
-                    <span class="timer-admin" id="admin-timer">60</span>
-                    <span style="color:#888; font-size:.85rem;">s restantes</span>
-                    <div class="timer-bar-bg"><div class="timer-bar-fill" id="admin-timer-bar" style="width:100%"></div></div>
-                </div>
-                <h3 id="admin-question-text" style="font-size:1.1rem; margin-bottom:14px; text-align:left;"></h3>
-                <ul class="admin-option-list" id="admin-options-list"></ul>
-                <div id="admin-answer-box" class="answer-reveal-box hidden">✅ Resposta correta: <span id="admin-answer-text"></span></div>
-                <div class="answered-info" id="admin-answered-info"></div>
-                <div class="admin-controls">
-                    <button class="btn btn-blue" id="btn-reveal-admin" onclick="adminRevealAnswer()">👁️ Revelar Resposta</button>
-                    <button class="btn" id="btn-next-admin" onclick="adminNextPhase()" style="display:none;">▶️ Próxima Fase</button>
-                    <button class="btn btn-danger" onclick="adminEndGame()">🏁 Encerrar Jogo</button>
-                </div>
-            </div>
-
-            <div id="tab-score" class="hidden">
-                <div class="players-list" id="admin-scoreboard"></div>
-            </div>
-
-            <div id="tab-players" class="hidden">
-                <div class="players-list" id="admin-players-list-game"></div>
-            </div>
-        </div>
+  <!-- TELA DO VELHO SÁBIO -->
+  <div class="screen off" id="sage-screen">
+    <button class="skip-btn blue" onclick="skipSage()" title="Pular diálogo">⏭ Pular</button>
+    <div class="sage-clouds" id="sage-clouds"></div>
+    <div class="sage-bg-icon">🧙</div>
+    <div id="sage-prof"></div>
+    <div class="sage-box">
+      <div class="sage-voice-tag">
+        <span class="vpulse-sage"></span> Velho Sábio
+        <button class="voice-btn" onclick="speakSage()" style="margin-left:auto;border-color:rgba(58,138,176,.4);color:#3a8ab0">🔊 Ouvir</button>
+      </div>
+      <div class="sage-txt" id="sage-txt"></div>
+      <div class="sage-hint off" id="sage-hint">[ toque para continuar ]</div>
     </div>
-
-    <!-- ===== TELA: JOGO (ALUNO) ===== -->
-    <div id="screen-game" class="hidden">
-        <header>
-            <div>Fase: <span id="current-phase">1</span>/25</div>
-            <div id="timer-display">⏱️ <span id="time-left">60</span>s</div>
-            <div id="score-display">⭐ <span id="my-score-display">0</span> pts</div>
-        </header>
-        <div class="mascot-container">
-            <div class="mascot" id="mascot">🐺</div>
-            <div class="speech-bubble" id="mascot-speech">Foco total! Quanto mais rápido responder, mais pontos!</div>
-        </div>
-        <h2 id="question-text" style="margin-bottom:10px; font-size:1.1rem;">Carregando pergunta...</h2>
-        <div class="options-grid" id="options-container"></div>
-    </div>
-
-    <!-- ===== TELA: FIM DE JOGO ===== -->
-    <div id="screen-end" class="hidden">
-        <canvas id="confetti-canvas"></canvas>
-        <h2 style="font-size:1.6rem; margin-bottom:4px;">🏆 Resultado Final!</h2>
-        <p style="color:#888; margin-bottom:16px;">O professor vai revelar o pódio...</p>
-
-        <div id="step-3" style="display:none;">
-            <div class="phase-title">🥉 Em 3º lugar...</div>
-            <div class="dots-anim" id="dots-3">● ● ●</div>
-        </div>
-        <div id="card-3" class="suspense-card">
-            <div class="suspense-medal">🥉</div>
-            <div class="suspense-avatar" id="av-3"></div>
-            <div class="suspense-name"   id="nm-3"></div>
-            <div class="suspense-pts"    id="pt-3"></div>
-        </div>
-
-        <div id="step-2" style="display:none;">
-            <div class="phase-title">🥈 Em 2º lugar...</div>
-            <div class="dots-anim" id="dots-2">● ● ●</div>
-        </div>
-        <div id="card-2" class="suspense-card">
-            <div class="suspense-medal">🥈</div>
-            <div class="suspense-avatar" id="av-2"></div>
-            <div class="suspense-name"   id="nm-2"></div>
-            <div class="suspense-pts"    id="pt-2"></div>
-        </div>
-
-        <div id="step-1" style="display:none;">
-            <div class="phase-title">🥇 E o grande vencedor é...</div>
-            <div class="dots-anim" id="dots-1">● ● ●</div>
-        </div>
-        <div id="card-1" class="suspense-card suspense-1st">
-            <div class="suspense-medal">🥇</div>
-            <div class="suspense-avatar" id="av-1"></div>
-            <div class="suspense-name"   id="nm-1"></div>
-            <div class="suspense-pts"    id="pt-1"></div>
-            <div class="parabens-box" id="parabens-box" style="display:none;">
-                🎉 Parabéns, <span id="parabens-nome"></span>! 🎉<br>
-                <span style="font-size:1rem; font-weight:normal;">Você foi o campeão do quiz!</span>
-            </div>
-        </div>
-
-        <div id="podio-controls" style="margin-top:12px;">
-            <button class="btn-suspense" id="btn-show3" onclick="showPodio(3)">🥉 Revelar 3º lugar</button>
-            <button class="btn-suspense" id="btn-show2" onclick="showPodio(2)" disabled style="display:none;">🥈 Revelar 2º lugar</button>
-            <button class="btn-suspense" id="btn-show1" onclick="showPodio(1)" disabled style="display:none;">🥇 Revelar 1º lugar</button>
-            <button class="btn-suspense" id="btn-showall" onclick="showFullTable()" style="display:none; background:linear-gradient(135deg,#43cea2,#185a9d);">📋 Ver tabela completa</button>
-        </div>
-
-        <div id="full-table">
-            <h3 style="margin-bottom:12px; color:#333;">Classificação Geral</h3>
-            <div id="full-table-rows"></div>
-            <button class="btn btn-orange" onclick="clearServer()" style="margin-top:18px;">🔄 Nova Partida</button>
-        </div>
-    </div>
+  </div>
 </div>
 
-<!-- OVERLAY SUSPENSE 1º -->
-<div id="suspense-overlay">
-    <div class="luz luz-1"></div><div class="luz luz-2"></div>
-    <div class="luz luz-3"></div><div class="luz luz-4"></div><div class="luz luz-5"></div>
-    <div id="suspense-fase-1">
-        <div class="tambores-wrap">
-            <span class="tambor">🥁</span><span class="tambor">🥁</span><span class="tambor">🥁</span>
-        </div>
-        <div class="suspense-titulo">E O CAMPEÃO É...</div>
-        <div class="suspense-reticencias">● ● ●</div>
-    </div>
-    <div id="reveal-nome-1">
-        <div class="reveal-avatar-big" id="reveal-av-big"></div>
-        <div class="reveal-nome-big"   id="reveal-nm-big"></div>
-        <div class="reveal-pts-big"    id="reveal-pt-big"></div>
-        <div class="reveal-parabens">🎉 PARABÉNS! 🎉</div>
-    </div>
-    <button id="btn-fechar-suspense" onclick="fecharSuspense()">🏆 Ver Classificação</button>
-</div>
-
-<!-- TELA TRAVADA -->
-<div id="screen-locked" class="lock-screen hidden">
-    <div class="spinner" id="lock-spinner">⏳</div>
-    <h2 id="lock-title">Resposta Enviada!</h2>
-    <p style="margin-top:8px; max-width:320px; color:#ccc; font-size:.95rem;" id="lock-subtitle">Aguarde o professor revelar a resposta...</p>
-    <div id="lock-result-area"></div>
+<!-- CRACK OVERLAY (fora do #gr para cobrir tudo) -->
+<div id="crack-overlay">
+  <svg class="crack-svg" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" id="crack-svg-el"></svg>
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════════════════
-//  BANCO DE PERGUNTAS
-// ═══════════════════════════════════════════════════════════════
-const questions = [
-    { phase:1,  subject:"Matemática", question:"Quanto é 7 × 8?",                                              options:["54","56","62","48"],                                            answer:"56" },
-    { phase:2,  subject:"Português",  question:"Qual das palavras abaixo é um substantivo?",                   options:["Correr","Bonito","Cachorro","Devagar"],                          answer:"Cachorro" },
-    { phase:3,  subject:"Ciências",   question:"Qual planeta é conhecido como o Planeta Vermelho?",            options:["Terra","Júpiter","Marte","Saturno"],                             answer:"Marte" },
-    { phase:4,  subject:"História",   question:"Quem descobriu o Brasil em 1500?",                             options:["Dom Pedro I","Pedro Álvares Cabral","Tiradentes","Colombo"],     answer:"Pedro Álvares Cabral" },
-    { phase:5,  subject:"Geografia",  question:"Qual é a capital do Brasil?",                                  options:["São Paulo","Rio de Janeiro","Brasília","Salvador"],              answer:"Brasília" },
-    { phase:6,  subject:"Matemática", question:"Se uma caixa tem 12 ovos, quantos têm em 3 caixas?",          options:["24","30","36","42"],                                             answer:"36" },
-    { phase:7,  subject:"Português",  question:"Qual o antônimo de 'Rápido'?",                                 options:["Veloz","Lento","Alto","Forte"],                                 answer:"Lento" },
-    { phase:8,  subject:"Ciências",   question:"Qual o estado físico da água quando ela vira gelo?",           options:["Líquido","Gasoso","Sólido","Plasma"],                            answer:"Sólido" },
-    { phase:9,  subject:"Geografia",  question:"Em qual continente fica o Brasil?",                            options:["Europa","África","Ásia","América do Sul"],                      answer:"América do Sul" },
-    { phase:10, subject:"História",   question:"O que comemoramos no dia 7 de Setembro?",                      options:["República","Dia do Trabalho","Independência do Brasil","Natal"], answer:"Independência do Brasil" },
-    { phase:11, subject:"Matemática", question:"Qual o resultado de 150 + 250?",                               options:["350","400","450","500"],                                         answer:"400" },
-    { phase:12, subject:"Português",  question:"Qual dessas palavras está grafada corretamente?",              options:["Caza","Chave","Xave","Asa"],                                     answer:"Chave" },
-    { phase:13, subject:"Ciências",   question:"Qual é o gás que nós respiramos para sobreviver?",             options:["Gás Carbônico","Oxigênio","Nitrogênio","Hélio"],                 answer:"Oxigênio" },
-    { phase:14, subject:"História",   question:"Quem proclamou a Independência do Brasil?",                    options:["Dom Pedro I","Zumbi","Deodoro da Fonseca","Dom Pedro II"],       answer:"Dom Pedro I" },
-    { phase:15, subject:"Geografia",  question:"Qual é o maior oceano do planeta Terra?",                      options:["Atlântico","Índico","Pacífico","Ártico"],                        answer:"Pacífico" },
-    { phase:16, subject:"Matemática", question:"Quanto é metade de 100?",                                      options:["25","40","50","60"],                                             answer:"50" },
-    { phase:17, subject:"Português",  question:"Quantas sílabas tem a palavra 'Borboleta'?",                   options:["2","3","4","5"],                                                answer:"4" },
-    { phase:18, subject:"Ciências",   question:"Qual estrela ilumina e aquece a Terra?",                       options:["Lua","Sol","Estrela D'Alva","Marte"],                            answer:"Sol" },
-    { phase:19, subject:"História",   question:"Quem já vivia no Brasil antes de 1500?",                       options:["Indígenas","Incas","Astecas","Romanos"],                         answer:"Indígenas" },
-    { phase:20, subject:"Geografia",  question:"Qual o maior rio em volume de água no Brasil?",                options:["São Francisco","Paraná","Amazonas","Nilo"],                      answer:"Amazonas" },
-    { phase:21, subject:"Matemática", question:"Quantos lados tem um pentágono?",                              options:["4","5","6","8"],                                                answer:"5" },
-    { phase:22, subject:"Português",  question:"A palavra 'Felicidade' é um:",                                 options:["Verbo","Adjetivo","Substantivo","Pronome"],                      answer:"Substantivo" },
-    { phase:23, subject:"Ciências",   question:"Qual animal abaixo é considerado um mamífero?",                options:["Tubarão","Baleia","Jacaré","Águia"],                             answer:"Baleia" },
-    { phase:24, subject:"História",   question:"As pirâmides antigas ficam em qual país?",                     options:["Grécia","Itália","Egito","México"],                              answer:"Egito" },
-    { phase:25, subject:"Geografia",  question:"Qual linha divide a Terra em Hemisfério Norte e Sul?",         options:["Equador","Capricórnio","Greenwich","Câncer"],                    answer:"Equador" }
-];
-
-const subjectBadgeClass = {
-    "Matemática":"badge-mat","Português":"badge-por","Ciências":"badge-cie","História":"badge-his","Geografia":"badge-geo"
+// ─── BANCO DE QUESTÕES ────────────────────────────────────────────────
+const BANCO = {
+  port:[
+    {q:"Qual é o plural correto de 'pão'?",opts:["Pães","Pãos","Pãoes","Pãens"],ans:0,ex:"'Pão' vira 'pães'. Palavras em ão podem ter plural em ões, ãos ou ães!"},
+    {q:"O que é um substantivo?",opts:["Uma ação","Palavra que nomeia coisas","Uma comparação","Palavra de ligação"],ans:1,ex:"Substantivos nomeiam coisas, pessoas, lugares e sentimentos."},
+    {q:"Qual frase tem erro de ortografia?",opts:["A menina foi à escola.","O cachoro latiu muito.","Hoje é dia de festa.","Ela gosta de brincar."],ans:1,ex:"Correto: 'cachorro' com dois r's!"},
+    {q:"O que é um verbo?",opts:["Nome de lugar","Palavra que indica ação ou estado","Palavra que liga frases","Descrição de objeto"],ans:1,ex:"Verbos indicam ação, estado ou fenômeno. Ex: correr, ser, chover."},
+    {q:"Qual das palavras é um adjetivo?",opts:["Correr","Mesa","Bonita","Rapidamente"],ans:2,ex:"Adjetivos caracterizam substantivos. 'Bonita' descreve como algo é!"},
+    {q:"Separe as sílabas de 'escola':",opts:["es-co-la","esco-la","e-sco-la","es-col-a"],ans:0,ex:"'Escola' separa-se es-co-la, com 3 sílabas."},
+    {q:"Qual é o antônimo de 'feliz'?",opts:["Alegre","Contente","Triste","Animado"],ans:2,ex:"Antônimo é a palavra de sentido oposto. 'Feliz' ↔ 'Triste'!"},
+    {q:"Em 'O menino correu rápido', qual é o sujeito?",opts:["correu","rápido","O menino","correu rápido"],ans:2,ex:"O sujeito é quem pratica a ação: 'O menino'!"},
+    {q:"O que é sílaba tônica?",opts:["A última sílaba","A pronunciada com mais força","A primeira sempre","A mais curta"],ans:1,ex:"Sílaba tônica é a pronunciada com mais força. Ex: CA-sa."},
+    {q:"Qual palavra é sinônimo de 'alegre'?",opts:["Bravo","Feliz","Triste","Cansado"],ans:1,ex:"'Alegre' e 'feliz' são sinônimos — têm sentidos parecidos!"}
+  ],
+  mat:[
+    {q:"Quanto é 356 + 248?",opts:["594","604","600","614"],ans:1,ex:"356 + 248 = 604. Some unidades, dezenas e centenas!"},
+    {q:"5 caixas com 12 lápis cada. Quantos lápis no total?",opts:["17","50","60","72"],ans:2,ex:"5 × 12 = 60 lápis!"},
+    {q:"Qual fração representa metade de um inteiro?",opts:["1/4","2/3","1/2","3/4"],ans:2,ex:"1/2 = dividir em 2 partes iguais e pegar uma — a metade!"},
+    {q:"Quanto é 1.000 ÷ 5?",opts:["150","200","250","500"],ans:1,ex:"1.000 ÷ 5 = 200!"},
+    {q:"Qual é o valor de 7²?",opts:["14","21","49","42"],ans:2,ex:"7² = 7 × 7 = 49!"},
+    {q:"Um triângulo tem quantos lados?",opts:["2","3","4","5"],ans:1,ex:"Todo triângulo tem 3 lados e 3 ângulos!"},
+    {q:"Quanto é 25% de 200?",opts:["25","50","75","100"],ans:1,ex:"25% = 1/4. Então 200 ÷ 4 = 50!"},
+    {q:"Soma dos ângulos internos de um triângulo:",opts:["90°","180°","270°","360°"],ans:1,ex:"A soma é sempre 180°!"},
+    {q:"Qual número é primo?",opts:["9","15","13","21"],ans:2,ex:"13 é primo — divisível só por 1 e por ele mesmo!"},
+    {q:"Ana comeu 3 das 8 fatias. Que fração ela comeu?",opts:["3/5","5/8","3/8","1/3"],ans:2,ex:"3 de 8 = 3/8 da pizza!"}
+  ],
+  cie:[
+    {q:"O que a planta precisa para fazer fotossíntese?",opts:["Água e sal","Luz, água e CO₂","Apenas terra","Somente chuva"],ans:1,ex:"Fotossíntese: luz solar + água + CO₂ → alimento + O₂!"},
+    {q:"Como se chama a transformação da lagarta em borboleta?",opts:["Hibernação","Fotossíntese","Metamorfose","Germinação"],ans:2,ex:"Metamorfose! Transformação completa de alguns animais."},
+    {q:"De onde vem a energia para nos movermos?",opts:["Do ar","Dos alimentos","Do sol diretamente","Da água"],ans:1,ex:"Os alimentos fornecem energia que o corpo transforma em movimento!"},
+    {q:"Qual órgão bombeia o sangue?",opts:["Pulmão","Fígado","Coração","Rim"],ans:2,ex:"O coração bombeia o sangue para todo o corpo!"},
+    {q:"O que os pulmões fazem?",opts:["Digerem alimentos","Filtram o sangue","Realizam a respiração","Produzem hormônios"],ans:2,ex:"Os pulmões trocam oxigênio e gás carbônico!"},
+    {q:"Qual destes animais é mamífero?",opts:["Jacaré","Baleia","Sapo","Cobra"],ans:1,ex:"A baleia é mamífero — amamenta seus filhotes!"},
+    {q:"O que é cadeia alimentar?",opts:["Receita de comida","Sequência de quem come quem","Lista de animais","Tipo de planta"],ans:1,ex:"Cadeia alimentar: ex. grama → coelho → raposa!"},
+    {q:"Qual estado da matéria tem forma e volume fixos?",opts:["Gasoso","Líquido","Sólido","Plasma"],ans:2,ex:"Sólido tem forma e volume fixos. Ex: pedra, gelo!"},
+    {q:"O que é um ecossistema?",opts:["Só os animais","Seres vivos + ambiente onde vivem","Apenas as plantas","Um tipo de célula"],ans:1,ex:"Ecossistema = seres vivos + ambiente físico!"},
+    {q:"Por que economizar água?",opts:["Para pagar menos","Porque é infinita","Porque é um recurso limitado","Porque tem gosto ruim"],ans:2,ex:"A água doce é limitada — economizar garante água para o futuro!"}
+  ],
+  hist:[
+    {q:"Quem chegou ao Brasil em 1500?",opts:["Cristóvão Colombo","Pedro Álvares Cabral","Vasco da Gama","Fernão de Magalhães"],ans:1,ex:"Pedro Álvares Cabral, em 22 de abril de 1500!"},
+    {q:"Que povos viviam no Brasil antes dos portugueses?",opts:["Astecas e Maias","Romanos","Povos indígenas","Africanos"],ans:2,ex:"Muitos povos indígenas com culturas e línguas diferentes!"},
+    {q:"Data da Independência do Brasil:",opts:["15 de novembro","7 de setembro","22 de abril","21 de abril"],ans:1,ex:"7 de setembro de 1822 — Dom Pedro I às margens do Ipiranga!"},
+    {q:"Quem foi Dom Pedro I?",opts:["Primeiro presidente","Imperador que proclamou a Independência","Rei de Portugal","General"],ans:1,ex:"Dom Pedro I proclamou a Independência do Brasil em 1822!"},
+    {q:"Em que ano foi abolida a escravidão?",opts:["1822","1850","1888","1900"],ans:2,ex:"Lei Áurea, assinada pela Princesa Isabel em 13 de maio de 1888!"},
+    {q:"Quem foi Tiradentes?",opts:["Rei português","Herói que lutou pela liberdade","Primeiro presidente","Descobridor do Brasil"],ans:1,ex:"Tiradentes liderou a Inconfidência Mineira em 1789!"},
+    {q:"O que foi a Proclamação da República?",opts:["Independência","Fim do Império em 1889","Descoberta","Abolição da escravidão"],ans:1,ex:"Em 15 de novembro de 1889 o Marechal Deodoro proclamou a República!"},
+    {q:"Principal produto explorado no Brasil colonial:",opts:["Café","Soja","Pau-brasil","Petróleo"],ans:2,ex:"O pau-brasil foi o primeiro produto explorado pelos portugueses!"},
+    {q:"O que foram as Missões Jesuíticas?",opts:["Escolas portuguesas","Aldeias onde jesuítas ensinavam indígenas","Navios de guerra","Festas"],ans:1,ex:"Comunidades onde padres jesuítas ensinavam os indígenas!"},
+    {q:"O que foi a escravidão no Brasil?",opts:["Comércio livre","Sistema que forçava pessoas a trabalhar sem liberdade","Período de paz","Uma festa"],ans:1,ex:"Sistema cruel — africanos trazidos à força para trabalhar sem direitos."}
+  ],
+  geo:[
+    {q:"Qual é a capital do Brasil?",opts:["São Paulo","Rio de Janeiro","Brasília","Salvador"],ans:2,ex:"Brasília é a capital federal desde 1960!"},
+    {q:"Com quantos países o Brasil faz fronteira?",opts:["5","7","10","12"],ans:2,ex:"O Brasil faz fronteira com 10 países da América do Sul!"},
+    {q:"Onde fica o Rio Amazonas?",opts:["Nordeste","Sul","Norte","Sudeste"],ans:2,ex:"Na Região Norte, com a maior floresta tropical do mundo!"},
+    {q:"Quantos estados tem o Brasil?",opts:["24","25","26","27"],ans:2,ex:"26 estados + Distrito Federal = 27 unidades federativas!"},
+    {q:"Qual é o maior bioma do Brasil?",opts:["Cerrado","Caatinga","Amazônia","Pantanal"],ans:2,ex:"A Amazônia é o maior bioma e a maior floresta tropical do mundo!"},
+    {q:"Em qual continente fica o Brasil?",opts:["África","Europa","América do Sul","América do Norte"],ans:2,ex:"O Brasil fica na América do Sul — o maior país do continente!"},
+    {q:"Qual é o rio mais extenso do Brasil?",opts:["Rio São Francisco","Rio Paraná","Rio Amazonas","Rio Tocantins"],ans:2,ex:"O Rio Amazonas é o mais extenso e o de maior volume de água!"},
+    {q:"Região mais populosa do Brasil:",opts:["Norte","Nordeste","Centro-Oeste","Sudeste"],ans:3,ex:"O Sudeste é a mais populosa — SP, RJ e MG!"},
+    {q:"Linha que divide a Terra em Norte e Sul:",opts:["Meridiano de Greenwich","Trópico de Capricórnio","Equador","Círculo Polar"],ans:2,ex:"O Equador divide a Terra em Hemisfério Norte e Sul!"},
+    {q:"O Brasil tem saída para qual oceano?",opts:["Pacífico","Índico","Atlântico","Ártico"],ans:2,ex:"O Brasil tem mais de 7.400 km de costa no Oceano Atlântico!"}
+  ]
 };
 
-// ═══════════════════════════════════════════════════════════════
-//  ESTADO LOCAL
-// ═══════════════════════════════════════════════════════════════
-let myId     = sessionStorage.getItem("quiz_my_id") || "player_" + Math.random().toString(36).substring(2,9);
-sessionStorage.setItem("quiz_my_id", myId);
+// ─── ELEMENTOS + RECOMPENSAS ─────────────────────────────────────────
+const ELEMS = [
+  {id:"port",name:"Português",  icon:"📖",hint:"Leitura e escrita",  scene:"📖",
+   reward:{icon:"📚",name:"Livro Mágico",    desc:"Um livro encantado que guarda todas as palavras do mundo!"},
+   nar:n=>`${n}, o Português guarda o poder das palavras. Leia com atenção cada questão!`},
+  {id:"mat", name:"Matemática", icon:"🔢",hint:"Números e contas",   scene:"🔢",
+   reward:{icon:"🧮",name:"Calculadora",     desc:"Uma calculadora dourada que resolve os maiores mistérios dos números!"},
+   nar:n=>`${n}, a Matemática é a linguagem do universo. Pense antes de responder!`},
+  {id:"cie", name:"Ciências",   icon:"🌿",hint:"Natureza e vida",    scene:"🌿",
+   reward:{icon:"🌱",name:"Plantinha Sábia", desc:"Uma plantinha que cresce com conhecimento e cuida do planeta!"},
+   nar:n=>`${n}, a natureza guarda segredos incríveis. Use seu conhecimento de Ciências!`},
+  {id:"hist",name:"História",   icon:"🏛️",hint:"O passado do Brasil",scene:"🏛️",
+   reward:{icon:"🪶",name:"Pena da História",desc:"A pena que registrou os momentos mais importantes do Brasil!"},
+   nar:n=>`${n}, o passado nos ensina o futuro. Mostre que conhece a História do Brasil!`},
+  {id:"geo", name:"Geografia",  icon:"🗺️",hint:"Lugares e mapas",   scene:"🗺️",
+   reward:{icon:"🌍",name:"Globo Terrestre", desc:"Um globo mágico que mostra todos os países e oceanos do mundo!"},
+   nar:n=>`${n}, o mundo é vasto e cheio de lugares incríveis. Prove que dominas a Geografia!`}
+];
 
-let myName = "", myAvatar = "🦊", isAdmin = false;
-let currentQuestionIndex = -1, myScore = 0, timeLeft = 60;
-let myLastSelected = "", myLastCorrect = "", myLastPoints = 0;
-let timerInterval, adminTimerInterval, adminTimerVal = 60;
-let _resultadoMostrado = false;
-let _unsubRoom = null, _unsubPlayers = null;
-let _podioSorted = [];
-let _muteAdminVoz = false;
-let _fbReady = false;
+// ─── ESTADO ──────────────────────────────────────────────────────────
+const MAX_LIVES = 5;
+const QS = 5;
+const CALVIN = "Calvin0";
+let pName="", pAv="", pIc="";
+let recovered = {};      // {id: true}
+let inventory = [];      // [{icon, name}]
+let totalOk = 0;
+let globalLives = MAX_LIVES;
+let curEl = null;
+let curQ = 0;
+let answered = false;
+let errosFase = 0;
+let narStep = 0;
+let faseQs = [];
+let curNarText = "";
 
-// ═══════════════════════════════════════════════════════════════
-//  AGUARDA FIREBASE ESTAR PRONTO
-// ═══════════════════════════════════════════════════════════════
-document.addEventListener("firebase-ready", () => {
-    _fbReady = true;
-    document.getElementById("setup-guide").style.display = "none";
-    document.getElementById("setup-ok").style.display    = "block";
-    initVoice();
-    checkActiveSession();
+// ─── ÁUDIO ───────────────────────────────────────────────────────────
+const Ctx = window.AudioContext || window.webkitAudioContext;
+let _ac;
+function getAC(){if(!_ac)try{_ac=new Ctx();}catch(e){}return _ac;}
+function beep(f,d,t="sine",v=.18,dl=0){
+  const a=getAC();if(!a)return;
+  const o=a.createOscillator(),g=a.createGain();
+  o.connect(g);g.connect(a.destination);
+  o.type=t;o.frequency.value=f;
+  g.gain.setValueAtTime(v,a.currentTime+dl);
+  g.gain.exponentialRampToValueAtTime(.001,a.currentTime+dl+d);
+  o.start(a.currentTime+dl);o.stop(a.currentTime+dl+d+.05);
+}
+function sfxOk()  {beep(520,.12,"sine",.2);beep(660,.12,"sine",.2,.13);beep(800,.2,"sine",.2,.27);}
+function sfxErr() {beep(260,.15,"sawtooth",.15);beep(200,.25,"sawtooth",.15,.18);}
+function sfxReward(){[0,.13,.26,.38].forEach((d,i)=>beep([523,659,784,1047][i],.18,"sine",.18,d));}
+function sfxClick(){beep(440,.07,"sine",.1);}
+function sfxVic() {[0,.15,.3,.45,.6].forEach((d,i)=>beep([523,659,784,880,1047][i],.22,"sine",.2,d));}
+function sfxDead(){beep(300,.2,"sawtooth",.2);beep(240,.2,"sawtooth",.18,.22);beep(180,.5,"sawtooth",.18,.45);}
+function sfxLife(){beep(600,.1,"sine",.2);beep(800,.15,"sine",.2,.12);beep(1000,.25,"sine",.2,.28);}
+function sfxSkip(){[0,.08,.16,.24,.32].forEach((d,i)=>beep([400,500,600,700,900][i],.12,"sine",.18,d));}
+
+// ─── VOZ ─────────────────────────────────────────────────────────────
+function speak(txt){
+  if(!window.speechSynthesis)return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(txt);
+  u.lang="pt-BR";u.rate=.95;u.pitch=1.05;
+  speechSynthesis.speak(u);
+}
+function speakNar(){speak(curNarText);}
+
+// ─── TELA ─────────────────────────────────────────────────────────────
+function show(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.add("off"));
+  document.getElementById(id).classList.remove("off");
+}
+
+// ─── ESTRELAS ────────────────────────────────────────────────────────
+function makeStars(){
+  const c=document.getElementById("sb");
+  for(let i=0;i<75;i++){
+    const s=document.createElement("div");s.className="star";
+    const sz=Math.random()*2+1;
+    s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${(Math.random()*3+2).toFixed(1)}s;--dl:-${(Math.random()*3).toFixed(1)}s`;
+    c.appendChild(s);
+  }
+}
+
+// ─── TOAST ───────────────────────────────────────────────────────────
+function toast(msg){
+  const t=document.createElement("div");t.className="toast";t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),2500);
+}
+
+// ─── VIDAS UI ────────────────────────────────────────────────────────
+function livesHTML(){
+  let h='<span class="gl-label">Vidas:</span>';
+  for(let i=0;i<Math.max(MAX_LIVES,globalLives);i++)
+    h+=`<span class="hrt" style="${i<globalLives?'':'opacity:.18'}">${i<globalLives?'❤️':'🖤'}</span>`;
+  return h;
+}
+function updateLives(){
+  document.getElementById("global-lives-map").innerHTML=livesHTML();
+  document.getElementById("global-lives-ch").innerHTML=livesHTML();
+}
+function phaseHeartsHTML(){
+  return `<span style="margin-right:.4rem">Tentativa neste elemento:</span>`
+    +`<span class="hrt" style="${errosFase===0?'':'opacity:.18'}">${errosFase===0?'❤️':'🖤'}</span>`
+    +`<span style="margin-left:.5rem;color:#c8a84b;font-size:10px">(1 erro permitido)</span>`;
+}
+
+// ─── INVENTÁRIO ──────────────────────────────────────────────────────
+function renderInv(){
+  const bar = document.getElementById("inv-bar");
+  // limpa tudo
+  bar.innerHTML = '<span class="inv-label">Itens:</span>';
+  if(inventory.length === 0){
+    const s=document.createElement("span");
+    s.id="inv-empty";s.style.cssText="color:#5a5040;font-size:12px;font-style:italic";
+    s.textContent="nenhum ainda...";
+    bar.appendChild(s);
+  } else {
+    inventory.forEach(item=>{
+      const s=document.createElement("span");
+      s.className="inv-item";s.title=item.name;s.textContent=item.icon;
+      bar.appendChild(s);
+    });
+  }
+}
+
+// ─── REWARD POPUP ────────────────────────────────────────────────────
+function showRewardPopup(el, bonus, onDone){
+  sfxReward();
+  // remove popup anterior se houver
+  const old=document.getElementById("rwOv");if(old)old.remove();
+
+  const ov=document.createElement("div");
+  ov.className="reward-overlay";ov.id="rwOv";
+
+  const bonusHtml = bonus
+    ? `<div class="reward-bonus">❤️ +1 vida bônus — passou sem errar nenhuma!</div>`
+    : "";
+
+  ov.innerHTML=`
+    <div class="reward-card">
+      <span class="reward-icon-big">${el.reward.icon}</span>
+      <div class="reward-title">✦ Item Desbloqueado! ✦</div>
+      <div class="reward-name">${el.reward.name}</div>
+      <div class="reward-desc">${el.reward.desc}</div>
+      ${bonusHtml}
+      <button class="reward-close" id="rw-close-btn">Guardar no inventário →</button>
+    </div>`;
+
+  document.getElementById("gr").appendChild(ov);
+
+  // botão fecha popup e executa callback
+  document.getElementById("rw-close-btn").addEventListener("click", function(){
+    ov.remove();
+    onDone();
+  });
+}
+
+// ─── BOTÃO AVANÇAR ───────────────────────────────────────────────────
+function refreshAdvanceBtn(){
+  const wrap=document.getElementById("advance-wrap");
+  wrap.innerHTML="";
+  const r=Object.values(recovered).filter(Boolean).length;
+  if(r===5){
+    const b=document.createElement("button");
+    b.className="btn advance";
+    b.textContent="✦ Avançar — O Saber foi Restaurado! ✦";
+    b.onclick=()=>{sfxVic();startVillainScene();};
+    wrap.appendChild(b);
+  }
+}
+
+// ─── PERFIL ──────────────────────────────────────────────────────────
+function profBand(id){
+  const c=document.getElementById(id);if(!c)return;
+  c.innerHTML=`<div class="prof-strip"><div class="pav">${pIc}</div><div><div class="pname">${pName}</div><div class="pclass">${pAv} — 5º ano</div></div></div>`;
+}
+
+// ─── MAPA ─────────────────────────────────────────────────────────────
+function buildMap(){
+  profBand("prof-map");
+  updateLives();
+  renderInv();
+  const g=document.getElementById("eg");g.innerHTML="";
+  const r=Object.values(recovered).filter(Boolean).length;
+  document.getElementById("sc-tag").textContent=`Recuperados: ${r} / 5`;
+  ELEMS.forEach(el=>{
+    const done=recovered[el.id];
+    const d=document.createElement("div");
+    d.className="elem-btn"+(done?" done":"");
+    d.innerHTML=`<span class="el-ic">${el.icon}</span><div><div class="el-nm">${el.name}</div><div class="el-ht">${el.hint}</div><div class="el-st ${done?"":"miss"}">${done?`✓ ${el.reward.icon} Recuperado!`:"✗ Roubado!"}</div></div>`;
+    if(!done) d.onclick=()=>{sfxClick();startChallenge(el);};
+    g.appendChild(d);
+  });
+  refreshAdvanceBtn();
+}
+
+function goMap(){sfxClick();buildMap();show("map-screen");}
+
+// ─── SHUFFLE / PICK ───────────────────────────────────────────────────
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+function pick(a,n){return shuffle(a).slice(0,n);}
+
+// ─── DESAFIO ─────────────────────────────────────────────────────────
+function startChallenge(el){
+  curEl=el;curQ=0;answered=false;errosFase=0;
+  faseQs=pick(BANCO[el.id],QS);
+
+  document.getElementById("ch-ic").textContent=el.icon;
+  document.getElementById("ch-tit").textContent=el.name;
+  document.getElementById("ch-desc").textContent=`Recupere o elemento de ${el.name}!`;
+  document.getElementById("scene-e").textContent=el.scene;
+
+  document.getElementById("fail-box").classList.add("off");
+  document.getElementById("q-box").style.display="block";
+  document.querySelector(".prog-wrap").style.display="flex";
+  document.querySelector(".phase-lives").style.display="flex";
+  document.querySelector(".ch-nar-box").style.display="flex";
+  document.getElementById("back-btn").textContent="← Voltar ao mapa";
+
+  updateLives();
+  document.getElementById("phase-lives").innerHTML=phaseHeartsHTML();
+
+  const nt=el.nar(pName);
+  document.getElementById("ch-nar-txt").textContent=nt;
+  document.getElementById("ch-voice-btn").onclick=()=>speak(nt);
+  speak(nt);
+
+  loadQ();
+  show("ch-screen");
+}
+
+function loadQ(){
+  const q=faseQs[curQ];
+  answered=false;
+  document.getElementById("plbl").textContent=`${curQ+1} / ${QS}`;
+  document.getElementById("pfill").style.width=`${((curQ+1)/QS)*100}%`;
+  document.getElementById("qtxt").textContent=q.q;
+  document.getElementById("q-speak-btn").onclick=()=>speak(q.q);
+
+  // embaralha alternativas
+  const idxs=shuffle([0,1,2,3]);
+  const newAns=idxs.indexOf(q.ans);
+  const og=document.getElementById("og");og.innerHTML="";
+  idxs.forEach((orig,pos)=>{
+    const b=document.createElement("button");b.className="opt";b.textContent=q.opts[orig];
+    b.onclick=(p=>()=>answerQ(p,newAns,q))(pos);
+    og.appendChild(b);
+  });
+  const fb=document.getElementById("fb");fb.style.display="none";fb.className="fb";
+}
+
+function answerQ(chosen, correctPos, q){
+  if(answered)return;answered=true;
+  const btns=document.querySelectorAll(".opt");
+  btns.forEach(b=>b.disabled=true);
+  const fb=document.getElementById("fb");
+  const isOk=chosen===correctPos;
+
+  if(isOk){
+    btns[chosen].classList.add("ok");
+    fb.textContent="🌟 "+q.ex;fb.className="fb ok";
+    totalOk++;sfxOk();speak("Muito bem! "+q.ex);
+  } else {
+    btns[chosen].classList.add("no");
+    btns[correctPos].classList.add("ok");
+    fb.textContent="😅 A certa está em verde. "+q.ex;fb.className="fb no";
+    errosFase++;globalLives--;
+    updateLives();
+    document.getElementById("phase-lives").innerHTML=phaseHeartsHTML();
+    sfxErr();speak(q.ex);
+  }
+  fb.style.display="block";
+
+  setTimeout(()=>{
+    if(globalLives<=0){showDead();return;}
+    if(errosFase>=2){showFail();return;}
+    curQ++;
+    if(curQ<QS){
+      loadQ();
+    } else {
+      // ── CONCLUIU A FASE ──
+      recovered[curEl.id]=true;
+      inventory.push({icon:curEl.reward.icon, name:curEl.reward.name});
+
+      const bonus = errosFase===0;
+      if(bonus){globalLives++;sfxLife();toast(`+1 vida bônus! Passou sem erros em ${curEl.name}! ❤️`);}
+
+      // popup → ao fechar, vai para o mapa
+      showRewardPopup(curEl, bonus, ()=>{
+        buildMap();
+        show("map-screen");
+      });
+    }
+  },2600);
+}
+
+function showFail(){
+  document.getElementById("q-box").style.display="none";
+  document.querySelector(".prog-wrap").style.display="none";
+  document.querySelector(".phase-lives").style.display="none";
+  document.querySelector(".ch-nar-box").style.display="none";
+  document.getElementById("fail-box").classList.remove("off");
+  document.getElementById("fail-sub").textContent=`Você errou 2 questões de ${curEl.name}. O elemento continua roubado e você perdeu 1 vida! Tente novamente.`;
+  document.getElementById("back-btn").textContent="← Voltar ao mapa";
+  speak(`Que pena, ${pName}! Duas questões erradas. Volte e tente novamente!`);
+}
+
+function showDead(){
+  sfxDead();
+  const r=Object.values(recovered).filter(Boolean).length;
+  document.getElementById("dead-sub").innerHTML=`<span style="color:#d08080;font-weight:700">${pIc} ${pName}</span>, suas forças se esgotaram... O vilão venceu desta vez. Mas o conhecimento nunca some — tente de novo!`;
+  document.getElementById("dead-score").textContent=`Elementos recuperados: ${r} / 5  ·  Acertos: ${totalOk}`;
+  show("dead-screen");
+  speak(`Oh não, ${pName}! Você perdeu todas as vidas. Tente novamente!`);
+}
+
+function showVic(){
+  sfxVic();
+  // Não mostra vitória ainda — vai para a cena do vilão primeiro!
+  startVillainScene();
+}
+
+// ─── CENA DO VILÃO ───────────────────────────────────────────────────
+let villStep = 0;
+let villCurText = "";
+let villTyping = null;
+let villPhase = "ask1"; // ask1 | ask2 | threat | boss
+
+const VILL_STEPS = [
+  // ASK 1 — voz suave, pedindo (jogador sente algo estranho)
+  {
+    phase:"ask1",
+    tag:"Voz Ancestral", tagClass:"good", pulseClass:"good",
+    bg:"🌑", bgOp:".07",
+    dread:true, // mostra caixinha de sensação ruim
+    txt: n=>`${n}... Você foi magnífico. Recuperou todos os elementos do saber. Mas agora... preciso que me entregue esses conhecimentos.`,
+    hint:"[ toque para continuar ]", hintClass:""
+  },
+  {
+    phase:"ask1b",
+    tag:"Voz Ancestral", tagClass:"good", pulseClass:"good",
+    bg:"🌑", bgOp:".07",
+    dread:true,
+    txt: n=>`Eles são meus, afinal. Sempre foram. Entregue-os agora... e tudo ficará bem.`,
+    hint: null, // mostra botões de escolha
+    hintClass:""
+  },
+  // CONFUSÃO — após recusar 1a vez, pede com gentileza
+  {
+    phase:"confused",
+    tag:"Voz Ancestral", tagClass:"good", pulseClass:"good",
+    bg:"🌑", bgOp:".09",
+    dread:true,
+    txt: n=>`Por favor, <span class="hlv">${n}</span>... Seja gentil. Entregue os elementos a mim. Eu cuido bem deles, prometo. Por gentileza...`,
+    hint: null,
+    hintClass:""
+  },
+  // AMEAÇA — voz fica grave, letras vermelhas, estrelas sobem
+  {
+    phase:"threat",
+    tag:"⚠ Voz das Trevas", tagClass:"bad", pulseClass:"bad",
+    bg:"💀", bgOp:".12",
+    risingStars:true, // dispara estrelas subindo
+    txt: n=>`<span class="hlr txt-threat">Então... você me obriga.</span><br>Se não me entregar os elementos do saber...<br><span class="hlr txt-threat">EU VOU TOMAR DE VOCÊ.</span>`,
+    hint:"[ toque para continuar ]", hintClass:"red"
+  },
+  {
+    phase:"threat2",
+    tag:"⚠ Voz das Trevas", tagClass:"bad", pulseClass:"bad",
+    bg:"💀", bgOp:".15",
+    txt: n=>`Prepare-se, <span class="hlr txt-threat">${n}</span>. Vou arrancar cada vida sua... até não sobrar nada. O conhecimento voltará para as trevas!`,
+    hint:"[ toque para o BOSS ]", hintClass:"red"
+  }
+];
+
+function startVillainScene(){
+  villStep=0; villPhase="ask1";
+  // perfil
+  document.getElementById("vill-prof").innerHTML=
+    `<div class="prof-strip"><div class="pav">${pIc}</div><div><div class="pname">${pName}</div><div class="pclass">${pAv} — 5º ano</div></div></div>`;
+  show("villain-screen");
+  renderVillStep();
+}
+
+function renderVillStep(){
+  const s = VILL_STEPS[villStep];
+  if(!s) return;
+
+  // tag de voz
+  const tag=document.getElementById("vill-tag");
+  const pulse=document.getElementById("vill-pulse");
+  const tagName=document.getElementById("vill-tag-name");
+  tag.className="vill-voice-tag "+s.tagClass;
+  pulse.className="vpulse-vill "+s.pulseClass;
+  tagName.textContent=s.tag;
+
+  // caixa
+  const box=document.getElementById("vill-box");
+  box.className="vill-box"+(s.tagClass==="bad"?" angry":"");
+
+  // bg
+  const bg=document.getElementById("vill-bg");
+  bg.textContent=s.bg;
+  bg.style.opacity=s.bgOp;
+  if(s.tagClass==="bad"){bg.style.filter="hue-rotate(180deg) saturate(3)";}
+  else{bg.style.filter="";}
+
+  // caixinha de sensação ruim (só nos steps com dread:true)
+  let dreadEl=document.getElementById("vill-dread");
+  if(s.dread){
+    if(!dreadEl){
+      dreadEl=document.createElement("div");
+      dreadEl.id="vill-dread";dreadEl.className="dread-box";
+      dreadEl.innerHTML=`<p class="dread-txt">⚠ Algo está errado... uma sensação estranha aperta seu peito. Será que você deveria entregar?</p>`;
+      box.insertAdjacentElement("beforebegin",dreadEl);
+    }
+  } else {
+    if(dreadEl)dreadEl.remove();
+  }
+
+  // estrelas subindo na ameaça
+  if(s.risingStars){spawnRisingStars();}
+
+  // texto com digitação
+  const txtEl=document.getElementById("vill-txt");
+  txtEl.className="vill-txt "+s.tagClass;
+  const rawHTML=typeof s.txt==="function"?s.txt(pName):s.txt;
+  const plain=rawHTML.replace(/<[^>]+>/g,"");
+  villCurText=plain;
+  txtEl.innerHTML="";
+  const hint=document.getElementById("vill-hint");
+  hint.classList.add("off");
+  document.getElementById("choice-area").innerHTML="";
+
+  let i=0;
+  if(villTyping)clearInterval(villTyping);
+  villTyping=setInterval(()=>{
+    i++;
+    txtEl.innerHTML=trimHTML(rawHTML,i)+'<span class="cur"></span>';
+    if(i>=plain.length){
+      clearInterval(villTyping);
+      txtEl.innerHTML=rawHTML;
+      // fala com voz diferente conforme fase
+      if(s.tagClass==="bad"){speakEvil(plain);}else{speak(plain);}
+      setTimeout(()=>{
+        if(s.hint===null){
+          showChoiceBtns(s.phase);
+        } else {
+          hint.textContent=s.hint;
+          hint.className="vill-hint"+(s.hintClass?" "+s.hintClass:"");
+        }
+      },400);
+    }
+  },40);
+}
+
+function spawnRisingStars(){
+  const emojis=["⭐","✨","💫","🌟","⚡"];
+  for(let i=0;i<22;i++){
+    const s=document.createElement("div");
+    s.className="rising-star";
+    s.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+    s.style.left=Math.random()*100+"vw";
+    s.style.bottom="10vh";
+    const dur=(Math.random()*1.2+1.0).toFixed(2)+"s";
+    const dl=(Math.random()*1.2).toFixed(2)+"s";
+    s.style.setProperty("--rs-d",dur);
+    s.style.setProperty("--rs-dl",dl);
+    document.body.appendChild(s);
+    setTimeout(()=>s.remove(),(parseFloat(dur)+parseFloat(dl)+0.3)*1000);
+  }
+}
+
+function trimHTML(html,n){let c=0,o="",t=false;for(let ch of html){if(ch==="<")t=true;if(!t){if(c>=n)break;c++;}o+=ch;if(ch===">")t=false;}return o;}
+
+function speakEvil(txt){
+  if(!window.speechSynthesis)return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(txt);
+  u.lang="pt-BR";u.rate=.75;u.pitch=.35;u.volume=1;
+  speechSynthesis.speak(u);
+}
+function speakVill(){
+  const s=VILL_STEPS[villStep];
+  if(s&&s.tagClass==="bad")speakEvil(villCurText);else speak(villCurText);
+}
+
+function showChoiceBtns(phase){
+  const area=document.getElementById("choice-area");
+  area.innerHTML="";
+  if(phase==="ask1b"){
+    // 1a escolha — dar ou recusar
+    area.innerHTML=`
+      <div class="choice-row">
+        <button class="choice-btn refuse" onclick="villRefuse1()">❌ Não vou entregar!</button>
+        <button class="choice-btn give" onclick="villGive()">✓ Entregar...</button>
+      </div>`;
+  } else if(phase==="confused"){
+    // 2a escolha — ainda recusa (jogador continua desconfiado)
+    area.innerHTML=`
+      <div class="choice-row">
+        <button class="choice-btn refuse" onclick="villRefuse2()">❌ Jamais! Não confio em você!</button>
+        <button class="choice-btn give" onclick="villGive()">✓ Ok... pode ficar com eles.</button>
+      </div>`;
+  }
+}
+
+function villRefuse1(){
+  sfxClick();
+  // vai para step "confused"
+  villStep=2;
+  renderVillStep();
+}
+function villRefuse2(){
+  sfxClick();
+  // vai para ameaça
+  villStep=3;
+  renderVillStep();
+  // toca som sinistro
+  beep(80,.8,"sawtooth",.2);beep(60,.8,"sawtooth",.18,.1);
+}
+function villGive(){
+  // entregou — vai para vitória sem boss
+  sfxClick();
+  if(window.speechSynthesis)speechSynthesis.cancel();
+  showTrueVic(false);
+}
+function villNext(){
+  sfxClick();
+  if(window.speechSynthesis)speechSynthesis.cancel();
+  villStep++;
+  if(villStep<VILL_STEPS.length){
+    renderVillStep();
+  } else {
+    startBoss();
+  }
+}
+
+// ─── BOSS BATTLE — NOVO SISTEMA ──────────────────────────────────────
+let bossLives=0;
+let bossStep=0; // mantido para compatibilidade
+let bossHP=5;          // vida total do boss (5 habilidades)
+let bossHPMax=5;
+let bossTimerInt=null;
+let bossTimeLeft=60;
+let bossAnswered=false;
+let bossHalfTaunted=false;
+
+// progresso de combo: quantas acertou de cada matéria nesta "rodada"
+// quando chega a 3, libera habilidade (uma vez por matéria)
+const BOSS_COMBO={port:0,mat:0,cie:0,hist:0,geo:0};
+const BOSS_SKILL_USED={port:false,mat:false,cie:false,hist:false,geo:false};
+const BOSS_SKILL_UNLOCKED={port:false,mat:false,cie:false,hist:false,geo:false};
+
+const BOSS_SKILL_INFO={
+  port:{icon:"📖",name:"Palavra Mágica",  color:"rgba(130,100,200,.8)",dmg:"Corta as palavras do vilão!"},
+  mat: {icon:"🔢",name:"Equação do Caos", color:"rgba(80,160,230,.8)", dmg:"Calcula o ponto fraco!"},
+  cie: {icon:"🌿",name:"Força da Natureza",color:"rgba(80,200,120,.8)",dmg:"Energia da vida contra as trevas!"},
+  hist:{icon:"🏛️",name:"Golpe Histórico",  color:"rgba(200,168,75,.8)",dmg:"O passado se volta contra ele!"},
+  geo: {icon:"🗺️",name:"Tempestade Global",color:"rgba(80,180,200,.8)",dmg:"O mundo inteiro contra o vilão!"}
+};
+
+// ─── BANCO EXCLUSIVO DO BOSS (perguntas diferentes das fases normais) ─
+const BANCO_BOSS = {
+  port:[
+    {q:"O que é um pronome?",opts:["Palavra que indica ação","Substitui ou acompanha o substantivo","Nome de lugar","Conectivo entre frases"],ans:1,ex:"Pronomes substituem ou acompanham substantivos. Ex: eu, você, ele, meu!"},
+    {q:"Qual palavra é um advérbio?",opts:["Correr","Bonito","Rapidamente","Mesa"],ans:2,ex:"Advérbios modificam verbos, adjetivos ou outros advérbios. 'Rapidamente' é um advérbio de modo!"},
+    {q:"Quantas vogais tem o alfabeto português?",opts:["4","5","6","7"],ans:1,ex:"As vogais são: A, E, I, O, U — 5 vogais!"},
+    {q:"O que é um parágrafo?",opts:["Uma frase solta","Um conjunto de frases sobre uma ideia","O título do texto","A última frase"],ans:1,ex:"Parágrafo é um conjunto de frases que desenvolvem uma mesma ideia!"},
+    {q:"Qual frase está no plural correto?",opts:["Os homem chegaram","Os homens chegou","Os homens chegaram","O homens chegaram"],ans:2,ex:"Sujeito e verbo devem concordar: 'os homens chegaram'!"},
+    {q:"O que é rima?",opts:["Repetição de ideias","Sons iguais ou parecidos no fim das palavras","Tipo de pontuação","Um advérbio"],ans:1,ex:"Rima é a semelhança de sons no final das palavras. Ex: amor / calor!"},
+    {q:"Qual é o diminutivo de 'casa'?",opts:["Casona","Casinha","Casão","Casebre"],ans:1,ex:"'Casinha' é o diminutivo de casa, indicando algo pequeno!"},
+    {q:"O que indica uma vírgula?",opts:["Fim de frase","Pausa breve ou separação de elementos","Surpresa","Uma pergunta"],ans:1,ex:"A vírgula indica pausa breve e separa elementos na oração!"},
+    {q:"Qual das palavras tem acento agudo?",opts:["Cama","Café","Bolo","Prato"],ans:1,ex:"'Café' tem acento agudo no 'é'. Indica vogal aberta e tônica!"},
+    {q:"O que é narrador em um texto?",opts:["O autor do livro","A voz que conta a história","O personagem principal","O leitor"],ans:1,ex:"O narrador é a voz que conta a história — pode ser personagem ou observador!"}
+  ],
+  mat:[
+    {q:"Qual é o dobro de 48?",opts:["86","94","96","84"],ans:2,ex:"Dobro = multiplicar por 2. 48 × 2 = 96!"},
+    {q:"Quanto é 3/4 de 80?",opts:["40","50","60","70"],ans:2,ex:"3/4 de 80: 80÷4=20, depois 20×3=60!"},
+    {q:"Um quadrado tem perímetro de 28 cm. Qual o lado?",opts:["5 cm","6 cm","7 cm","8 cm"],ans:2,ex:"Perímetro do quadrado = 4 × lado. Então 28÷4 = 7 cm!"},
+    {q:"Quanto é 15²?",opts:["175","200","225","250"],ans:2,ex:"15² = 15 × 15 = 225!"},
+    {q:"Qual é o MMC de 4 e 6?",opts:["8","10","12","24"],ans:2,ex:"MMC(4,6) = 12, pois é o menor múltiplo comum dos dois!"},
+    {q:"Trem a 80 km/h por 3 horas. Quantos km percorre?",opts:["160","200","240","280"],ans:2,ex:"Distância = velocidade × tempo. 80 × 3 = 240 km!"},
+    {q:"Qual é a metade de 3/4?",opts:["1/4","3/8","1/2","1/3"],ans:1,ex:"Metade de 3/4 = 3/4 ÷ 2 = 3/8!"},
+    {q:"Uma pizza tem 8 fatias. João comeu 37,5%. Quantas fatias?",opts:["2","3","4","5"],ans:1,ex:"37,5% de 8 = 0,375 × 8 = 3 fatias!"},
+    {q:"Qual número é divisível por 3 e por 4?",opts:["10","14","24","22"],ans:2,ex:"24 ÷ 3 = 8 e 24 ÷ 4 = 6. 24 é divisível pelos dois!"},
+    {q:"Uma piscina tem 1.500 L. Sai 250 L por dia. Quantos dias até esvaziar?",opts:["4","5","6","7"],ans:2,ex:"1.500 ÷ 250 = 6 dias!"}
+  ],
+  cie:[
+    {q:"O que é biodiversidade?",opts:["Só animais","Variedade de seres vivos em um local","Tipo de planta","Nome de um bioma"],ans:1,ex:"Biodiversidade é a variedade de formas de vida — animais, plantas, fungos e mais!"},
+    {q:"Por que não devemos jogar lixo nos rios?",opts:["Porque é feio","Polui a água e mata seres vivos","Porque é ilegal","Porque pesa"],ans:1,ex:"O lixo polui a água, mata peixes e contamina o que bebemos!"},
+    {q:"O que é a camada de ozônio?",opts:["Uma nuvem","Camada que protege da radiação solar","Tipo de gás poluente","Parte do oceano"],ans:1,ex:"A camada de ozônio protege a Terra dos raios ultravioleta do Sol!"},
+    {q:"Qual é a função das raízes de uma planta?",opts:["Fazer fotossíntese","Absorver água e nutrientes do solo","Produzir flores","Respirar ar"],ans:1,ex:"As raízes absorvem água e sais minerais do solo para a planta!"},
+    {q:"O que acontece na digestão?",opts:["O sangue é produzido","Os alimentos são quebrados e absorvidos","O ar é filtrado","Os ossos crescem"],ans:1,ex:"Na digestão, os alimentos são transformados em nutrientes que o corpo absorve!"},
+    {q:"Qual é a fonte primária de energia dos ecossistemas?",opts:["Água","Vento","Sol","Solo"],ans:2,ex:"O Sol é a fonte primária de energia — as plantas captam sua luz para fotossíntese!"},
+    {q:"O que é um fóssil?",opts:["Uma rocha colorida","Resto ou marca de ser vivo preservado","Um tipo de mineral","Uma estrela morta"],ans:1,ex:"Fósseis são restos ou impressões de seres vivos preservados em rochas!"},
+    {q:"Por que os cactos têm espinhos?",opts:["Para ser bonito","Para guardar água","Para se defender e reduzir perda de água","Para crescer mais rápido"],ans:2,ex:"Os espinhos são folhas modificadas que defendem o cacto e reduzem a perda de água!"},
+    {q:"O que é energia renovável?",opts:["Energia do carvão","Energia que se renova naturalmente (sol, vento)","Energia nuclear","Energia do petróleo"],ans:1,ex:"Energia renovável vem de fontes que se renovam: solar, eólica, hídrica!"},
+    {q:"Qual órgão filtra o sangue e produz urina?",opts:["Fígado","Coração","Rim","Pulmão"],ans:2,ex:"Os rins filtram o sangue e produzem a urina eliminando substâncias desnecessárias!"}
+  ],
+  hist:[
+    {q:"Quem foi Zumbi dos Palmares?",opts:["Rei português","Líder do maior quilombo do Brasil","Explorador holandês","General da Independência"],ans:1,ex:"Zumbi liderou o Quilombo dos Palmares, símbolo da resistência à escravidão!"},
+    {q:"O que foi a Revolução Industrial?",opts:["Uma guerra","Mudança para produção em máquinas e fábricas","Uma lei do Brasil","Descoberta da América"],ans:1,ex:"A Revolução Industrial (séc. XVIII) transformou a produção artesanal em industrial!"},
+    {q:"Quem assinou a Lei Áurea?",opts:["Dom Pedro I","Dom Pedro II","Princesa Isabel","Deodoro da Fonseca"],ans:2,ex:"A Princesa Isabel assinou a Lei Áurea em 13 de maio de 1888, abolindo a escravidão!"},
+    {q:"O que foi a Semana de Arte Moderna de 1922?",opts:["Uma guerra","Movimento que renovou a arte brasileira","Uma lei","Uma conquista territorial"],ans:1,ex:"A Semana de 22 em São Paulo revolucionou a arte e a cultura brasileira!"},
+    {q:"Qual foi o papel dos africanos no Brasil colonial?",opts:["Exploradores","Trabalhadores escravizados que construíram o país","Governantes","Missionários"],ans:1,ex:"Africanos escravizados foram fundamentais na construção econômica e cultural do Brasil!"},
+    {q:"O que era o Brasil Império?",opts:["Período republicano","Período em que o Brasil era governado por imperadores","Colônia de Portugal","Era dos índios"],ans:1,ex:"O Brasil Império (1822–1889) foi governado por Dom Pedro I e Dom Pedro II!"},
+    {q:"Por que Brasília foi construída?",opts:["Para ser a maior cidade","Para interiorizar o desenvolvimento e ser a nova capital","Por ordem de Portugal","Para ser um porto"],ans:1,ex:"Brasília foi construída em 1960 para ser a nova capital e desenvolver o interior!"},
+    {q:"O que foi a Guerra do Paraguai?",opts:["Uma batalha medieval","Maior conflito armado da América do Sul (1864–1870)","Uma revolução interna","Invasão europeia"],ans:1,ex:"A Guerra do Paraguai (1864–1870) foi o maior conflito armado da história sul-americana!"},
+    {q:"Quem foi Santos Dumont?",opts:["Pintor brasileiro","Inventor que desenvolveu o avião no Brasil","Presidente do Brasil","Poeta famoso"],ans:1,ex:"Santos Dumont é considerado o pai da aviação por muitos — inventou o 14-Bis em 1906!"},
+    {q:"O que é patrimônio histórico?",opts:["Dinheiro antigo","Bens culturais e históricos preservados para a sociedade","Tipo de museu","Uma lei"],ans:1,ex:"Patrimônio histórico são bens culturais que preservam a memória e identidade de um povo!"}
+  ],
+  geo:[
+    {q:"Qual é a maior floresta tropical do mundo?",opts:["Floresta Boreal","Floresta Atlântica","Floresta Amazônica","Floresta do Congo"],ans:2,ex:"A Floresta Amazônica é a maior floresta tropical do mundo, com mais de 5 milhões de km²!"},
+    {q:"O que são paralelos e meridianos?",opts:["Tipos de vento","Linhas imaginárias para localização no globo","Montanhas submarinas","Tipos de solo"],ans:1,ex:"Paralelos e meridianos são linhas imaginárias que formam a grade de coordenadas geográficas!"},
+    {q:"Qual região brasileira tem o clima mais seco?",opts:["Sul","Norte","Nordeste","Centro-Oeste"],ans:2,ex:"O Nordeste tem o clima semiárido, com a região do sertão sofrendo longas secas!"},
+    {q:"O que é uma bacia hidrográfica?",opts:["Uma represa","Conjunto de rios que deságuam num mesmo lugar","Um tipo de solo","Região sem chuvas"],ans:1,ex:"Bacia hidrográfica é o conjunto de rios e afluentes que drenam para um rio principal!"},
+    {q:"Quais são os pontos cardeais?",opts:["Alto, baixo, frente, atrás","Norte, Sul, Leste, Oeste","Latitude, longitude, altitude, profundidade","Centro, borda, topo, base"],ans:1,ex:"Os quatro pontos cardeais são: Norte, Sul, Leste e Oeste!"},
+    {q:"O que é urbanização?",opts:["Plantio nas cidades","Crescimento das cidades e aumento da população urbana","Criação de parques","Industrialização rural"],ans:1,ex:"Urbanização é o crescimento das cidades e a migração da população do campo para elas!"},
+    {q:"Qual é o país mais populoso do mundo?",opts:["EUA","Brasil","China","Índia"],ans:3,ex:"A Índia ultrapassou a China em 2023 e é atualmente o país mais populoso do mundo!"},
+    {q:"O que é relevo?",opts:["Tipo de clima","Conjunto de formas da superfície terrestre","Tipo de vegetação","Nome de um rio"],ans:1,ex:"Relevo é o conjunto de formas da superfície da Terra: montanhas, planaltos, planícies!"},
+    {q:"Qual é o maior oceano do mundo?",opts:["Atlântico","Índico","Ártico","Pacífico"],ans:3,ex:"O Oceano Pacífico é o maior do mundo, ocupando mais de 1/3 da superfície terrestre!"},
+    {q:"O que é migração?",opts:["Tipo de cultura","Deslocamento de pessoas de um lugar para outro","Crescimento de plantas","Nome de um vento"],ans:1,ex:"Migração é o movimento de pessoas de uma região para outra em busca de melhores condições!"}
+  ]
+};
+
+let bossPool=[];
+let bossUsed=[];
+let bossCurQ=null;
+let bossCurQIdx=-1;      // índice no pool da questão atual
+let bossSkillBurnedIdx=new Set(); // índices de questões onde o poder foi usado
+
+const BOSS_TAUNT_HALF=[
+  "Hah... garoto, não acho que você conseguiu! Só tirou um pouquinho da minha vida! Isso é tudo?",
+  "Metade? Metade da minha vida?! Garoto, isso é pouco demais para me parar...",
+  "Garoto, não acho que vai conseguir. Só tirou um pouco de mim. Eu tenho trevas infinitas!",
+  "Tá bem, garoto... você chegou até aqui. Mas não vai adiantar — só tirou um pouco da minha vida!"
+];
+const BOSS_TAUNT_DIE=[
+  "Eu... eu subestimei você. O conhecimento... foi mais forte do que eu imaginei...",
+  "Impossível! Eu subestimei seu poder... o saber venceu! Eu me enganei sobre você.",
+  "Não pode ser... eu subestimei cada elemento que aprendeu. O conhecimento prevalece!",
+  "Você ganhou... Eu subestimei você. O saber é invencível — e eu estava errado sobre tudo."
+];
+
+function startBoss(){
+  bossLives=globalLives;
+  bossStep=0;
+  bossHP=bossHPMax=5;
+  bossHalfTaunted=false;
+  bossCurQIdx=-1;
+  bossSkillBurnedIdx=new Set();
+  // reset combos e habilidades
+  ['port','mat','cie','hist','geo'].forEach(k=>{
+    BOSS_COMBO[k]=0;BOSS_SKILL_USED[k]=false;BOSS_SKILL_UNLOCKED[k]=false;
+  });
+  // monta pool: começa com questões de matemática embaralhadas, depois o resto embaralhado
+  const matQs = shuffle(BANCO_BOSS['mat'].map(q=>({...q,subj:'mat'})));
+  const restQs = shuffle(['port','cie','hist','geo'].flatMap(id=>BANCO_BOSS[id].map(q=>({...q,subj:id}))));
+  bossPool = [...matQs, ...restQs];
+  bossUsed=[];
+
+  makeBossStars();
+  show("boss-screen");
+
+  // Se só 1 vida — derrota imediata
+  if(bossLives<=1){
+    renderBossLives();
+    document.getElementById("boss-speech").textContent="Com apenas uma vida... você nunca teve chance. As trevas vencem! 💀";
+    document.getElementById("boss-hp-fill").style.width="100%";
+    document.getElementById("boss-hp-txt").textContent="5/5";
+    document.getElementById("boss-q-box").style.display="none";
+    document.getElementById("boss-skills-row").style.display="none";
+    document.getElementById("boss-combo-row").style.display="none";
+    speakEvil("Com apenas uma vida... você nunca teve chance. As trevas vencem!");
+    beep(100,.4,"sawtooth",.25);beep(80,.4,"sawtooth",.2,.15);
+    setTimeout(()=>{
+      const hEl=document.getElementById("bh0");
+      if(hEl){hEl.classList.add("losing");setTimeout(()=>hEl.classList.add("gone"),600);}
+      bossLives=0;globalLives=0;
+      setTimeout(()=>{
+        sfxDead();
+        document.getElementById("dead-sub").innerHTML=`<span style="color:#d08080;font-weight:700">${pIc} ${pName}</span> — o vilão arrancou todo o seu saber... As trevas venceram desta vez. Mas o conhecimento nunca desaparece para sempre!`;
+        document.getElementById("dead-score").textContent=`Elementos recuperados: 5 / 5  ·  Acertos: ${totalOk} de ${ELEMS.length*QS}`;
+        show("dead-screen");
+        speak("O vilão venceu. Mas não desista! O conhecimento nunca some para sempre.");
+      },1200);
+    },2200);
+    return;
+  }
+
+  renderBossCombo();
+  renderBossSkills();
+  renderBossLives();
+  updateBossHP();
+  bossSpeech("Pensou que me derrotaria? O conhecimento não é seu! Vamos ver se aguenta as minhas questões... ⚡");
+  setTimeout(()=>loadBossQ(),1200);
+}
+
+function makeBossStars(){
+  const c=document.getElementById("boss-stars");c.innerHTML="";
+  for(let i=0;i<50;i++){
+    const s=document.createElement("div");s.className="boss-star";
+    const sz=Math.random()*3+1;
+    s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${(Math.random()*2+1).toFixed(1)}s;--dl:-${(Math.random()*2).toFixed(1)}s`;
+    c.appendChild(s);
+  }
+}
+
+function renderBossLives(){
+  const row=document.getElementById("boss-lives-row");
+  row.innerHTML='<span style="margin-right:.5rem;font-family:\'Cinzel\',serif;font-size:10px;letter-spacing:2px;color:#c05050;text-transform:uppercase">Vidas:</span>';
+  for(let i=0;i<MAX_LIVES;i++){
+    const sp=document.createElement("span");
+    sp.className="boss-hrt"+(i>=bossLives?" gone":"");
+    sp.id=`bh${i}`;sp.textContent=i<bossLives?"❤️":"🖤";
+    row.appendChild(sp);
+  }
+}
+
+function updateBossHP(){
+  const pct=(bossHP/bossHPMax)*100;
+  document.getElementById("boss-hp-fill").style.width=pct+"%";
+  document.getElementById("boss-hp-txt").textContent=`${bossHP}/${bossHPMax}`;
+  // cor muda com HP
+  const fill=document.getElementById("boss-hp-fill");
+  if(pct>60)fill.style.background="linear-gradient(90deg,#c00,#ff4444)";
+  else if(pct>30)fill.style.background="linear-gradient(90deg,#a00,#ff6600)";
+  else fill.style.background="linear-gradient(90deg,#600,#ff2222)";
+}
+
+function bossSpeech(txt){
+  const el=document.getElementById("boss-speech");
+  el.textContent=txt;
+  speakEvil(txt.replace(/[💀⚡👁️🔥]/g,""));
+}
+
+function renderBossCombo(){
+  const row=document.getElementById("boss-combo-row");row.innerHTML="";
+  ['port','mat','cie','hist','geo'].forEach(id=>{
+    const sk=BOSS_SKILL_INFO[id];
+    const done=BOSS_SKILL_UNLOCKED[id];
+    const used=BOSS_SKILL_USED[id];
+    const cnt=BOSS_COMBO[id];
+    const d=document.createElement("div");d.className="combo-pip";
+    let pips="";
+    for(let i=0;i<3;i++) pips+=`<div class="pip${i<cnt||done?" lit":""}"></div>`;
+    d.innerHTML=`<div class="combo-pips">${pips}</div><div style="font-size:13px">${sk.icon}</div><div class="combo-lbl">${used?"✓":done?"Pronto!":cnt+"/3"}</div>`;
+    d.title=sk.name;
+    row.appendChild(d);
+  });
+}
+
+function renderBossSkills(){
+  const row=document.getElementById("boss-skills-row");row.innerHTML="";
+  const area=document.getElementById("boss-skill-area");area.innerHTML="";
+  let anyReady=false;
+  ['port','mat','cie','hist','geo'].forEach(id=>{
+    if(!BOSS_SKILL_UNLOCKED[id]||BOSS_SKILL_USED[id])return;
+    anyReady=true;
+    const sk=BOSS_SKILL_INFO[id];
+    const btn=document.createElement("button");
+    btn.className="skill-btn ready";
+    btn.innerHTML=`${sk.icon} Usar ${sk.name}`;
+    btn.style.borderColor=sk.color;
+    btn.onclick=()=>useBossSkill(id);
+    row.appendChild(btn);
+  });
+  // se tem habilidade pronta, mostra instrução no area
+  if(anyReady){
+    area.innerHTML=`<div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;color:rgba(100,200,130,.6);text-transform:uppercase;text-align:center;margin-top:.2rem">✦ Habilidade disponível! Toque para causar dano ao vilão ✦</div>`;
+  }
+}
+
+function useBossSkill(id){
+  if(BOSS_SKILL_USED[id]||!BOSS_SKILL_UNLOCKED[id])return;
+  if(bossAnswered && bossHP>0){
+    // durante uma questão respondida: só pode se está aguardando usar habilidade
+  }
+  stopBossTimer();
+  BOSS_SKILL_USED[id]=true;
+  // marca a questão atual como queimada — não volta mais
+  if(bossCurQIdx>=0) bossSkillBurnedIdx.add(bossCurQIdx);
+  const sk=BOSS_SKILL_INFO[id];
+  sfxReward();
+
+  // dano no boss
+  const fill=document.getElementById("boss-hp-fill");
+  fill.parentElement.style.animation="none";
+  bossHP--;
+  if(bossHP<0)bossHP=0;
+  updateBossHP();
+
+  // flash verde
+  const flash=document.createElement("div");
+  flash.style.cssText="position:fixed;inset:0;background:rgba(100,200,130,.18);z-index:9999;pointer-events:none";
+  document.body.appendChild(flash);
+  setTimeout(()=>flash.remove(),500);
+
+  bossSpeech(`${sk.icon} ${sk.dmg} ARGH! ⚡`);
+  renderBossCombo();
+  renderBossSkills();
+
+  // verifica vitória primeiro
+  if(bossHP<=0){
+    setTimeout(()=>bossVictory(),900);
+    return;
+  }
+
+  // taunt na metade
+  if(bossHP<=(bossHPMax/2) && !bossHalfTaunted){
+    bossHalfTaunted=true;
+    const t=BOSS_TAUNT_HALF[Math.floor(Math.random()*BOSS_TAUNT_HALF.length)];
+    setTimeout(()=>bossSpeech(t),800);
+  }
+
+  // verifica se ainda tem outra habilidade pronta para usar
+  const stillReady=Object.keys(BOSS_SKILL_UNLOCKED).some(k=>BOSS_SKILL_UNLOCKED[k]&&!BOSS_SKILL_USED[k]);
+  if(stillReady){
+    setTimeout(()=>{
+      bossSpeech("⚠ Ainda tem outra habilidade disponível! Use antes de continuar!");
+    },1200);
+    // não avança — espera usar a próxima habilidade disponível
+  } else {
+    // todas as habilidades disponíveis foram usadas — próxima questão
+    setTimeout(()=>{
+      if(globalLives>0 && bossHP>0) loadBossQ();
+    },1500);
+  }
+}
+
+// ─── QUESTÕES DO BOSS ────────────────────────────────────────────────
+function loadBossQ(){
+  // recicla bossUsed se acabar (mas mantém burned fora)
+  if(bossUsed.length>=bossPool.length) bossUsed=[];
+  // filtra questões já usadas E queimadas por habilidade
+  let available=bossPool.map((_,i)=>i).filter(i=>!bossUsed.includes(i)&&!bossSkillBurnedIdx.has(i));
+  // se não sobrar nada (muito raro), só exclui as usadas normais
+  if(available.length===0){bossUsed=[];available=bossPool.map((_,i)=>i).filter(i=>!bossSkillBurnedIdx.has(i));}
+  // se AINDA não sobrar (todos queimados), reseta tudo
+  if(available.length===0){bossUsed=[];bossSkillBurnedIdx=new Set();available=bossPool.map((_,i)=>i);}
+
+  const idx=available[Math.floor(Math.random()*available.length)];
+  bossUsed.push(idx);
+  bossCurQIdx=idx;
+  bossCurQ=bossPool[idx];
+  bossAnswered=false;
+
+  const sk=BOSS_SKILL_INFO[bossCurQ.subj];
+  document.getElementById("boss-q-subj").textContent=sk.icon;
+  document.getElementById("boss-q-txt").textContent=bossCurQ.q;
+  const fb=document.getElementById("boss-fb");fb.style.display="none";fb.className="";
+
+  // embaralha alternativas
+  const idxs=shuffle([0,1,2,3]);
+  const newAns=idxs.indexOf(bossCurQ.ans);
+  const og=document.getElementById("boss-opts");og.innerHTML="";
+  idxs.forEach((orig,pos)=>{
+    const b=document.createElement("button");b.className="boss-opt";b.textContent=bossCurQ.opts[orig];
+    b.onclick=(p=>()=>answerBossQ(p,newAns,bossCurQ))(pos);
+    og.appendChild(b);
+  });
+
+  startBossTimer();
+}
+
+function startBossTimer(){
+  stopBossTimer();
+  bossTimeLeft=60;
+  document.getElementById("boss-timer-txt").textContent="60";
+  document.getElementById("boss-timer-fill").style.width="100%";
+  document.getElementById("boss-timer-fill").style.background="#c8a84b";
+  document.getElementById("boss-timer-fill").style.transition="width .25s linear";
+
+  bossTimerInt=setInterval(()=>{
+    bossTimeLeft--;
+    const pct=(bossTimeLeft/60)*100;
+    document.getElementById("boss-timer-txt").textContent=bossTimeLeft;
+    document.getElementById("boss-timer-fill").style.width=pct+"%";
+    if(bossTimeLeft<=15) document.getElementById("boss-timer-fill").style.background="#ff4444";
+    else if(bossTimeLeft<=30) document.getElementById("boss-timer-fill").style.background="#ff8800";
+    if(bossTimeLeft<=0){
+      stopBossTimer();
+      onBossTimeout();
+    }
+  },1000);
+}
+
+function stopBossTimer(){
+  if(bossTimerInt){clearInterval(bossTimerInt);bossTimerInt=null;}
+  document.getElementById("boss-timer-fill").style.transition="none";
+}
+
+function onBossTimeout(){
+  if(bossAnswered)return;
+  bossAnswered=true;
+  // tempo esgotado — boss drena 1 vida
+  document.querySelectorAll(".boss-opt").forEach(b=>b.disabled=true);
+  const fb=document.getElementById("boss-fb");
+  fb.style.cssText="font-size:11px;padding:.4rem .7rem;border-radius:7px;margin-top:.4rem;display:block;line-height:1.4;background:rgba(200,70,70,.1);color:#d08080";
+  fb.textContent="⏱ Tempo esgotado! O vilão aproveitou sua demora...";
+  bossSpeech("Devagar demais! Senti fraqueza no seu pensamento! Sua vida é minha! 👁️");
+  sfxErr();
+  bossLoseLife(()=>{
+    if(globalLives>0) setTimeout(()=>loadBossQ(),1200);
+  });
+}
+
+function answerBossQ(chosen, correctPos, q){
+  if(bossAnswered)return;
+  bossAnswered=true;
+  stopBossTimer();
+  const btns=document.querySelectorAll(".boss-opt");
+  btns.forEach(b=>b.disabled=true);
+  const fb=document.getElementById("boss-fb");
+  const isOk=chosen===correctPos;
+
+  if(isOk){
+    btns[chosen].classList.add("ok");
+    fb.style.cssText="font-size:11px;padding:.4rem .7rem;border-radius:7px;margin-top:.4rem;display:block;line-height:1.4;background:rgba(100,200,130,.08);color:#7dd9a0";
+    fb.textContent="🌟 "+q.ex;
+    sfxOk();
+    totalOk++;
+    // incrementa combo da matéria
+    const subj=q.subj;
+    let justUnlocked=false;
+    if(!BOSS_SKILL_UNLOCKED[subj]){
+      BOSS_COMBO[subj]=Math.min(BOSS_COMBO[subj]+1,3);
+      if(BOSS_COMBO[subj]>=3){
+        BOSS_SKILL_UNLOCKED[subj]=true;
+        justUnlocked=true;
+        sfxLife();
+        toast(`${BOSS_SKILL_INFO[subj].icon} Habilidade "${BOSS_SKILL_INFO[subj].name}" desbloqueada! Use agora!`);
+      }
+    }
+    renderBossCombo();
+    renderBossSkills();
+
+    // verifica se tem habilidade disponível para usar
+    const hasReady=Object.keys(BOSS_SKILL_UNLOCKED).some(k=>BOSS_SKILL_UNLOCKED[k]&&!BOSS_SKILL_USED[k]);
+    if(hasReady){
+      // bloqueia avanço — jogador DEVE usar a habilidade
+      if(justUnlocked){
+        bossSpeech(`${BOSS_SKILL_INFO[subj].icon} O quê?! Você desbloqueou um poder! USE AGORA contra mim! 😤`);
+      } else {
+        bossSpeech("Você tem um poder disponível! Use a habilidade antes de continuar! ⚠");
+      }
+      // não chama loadBossQ — espera o jogador usar a habilidade
+    } else {
+      const taunts=["Sorte sua... mas não vai durar!","Isso não vai me parar!","Continue tentando, garoto..."];
+      bossSpeech(taunts[Math.floor(Math.random()*taunts.length)]);
+      setTimeout(()=>{
+        if(globalLives>0 && bossHP>0) loadBossQ();
+      },1600);
+    }
+  } else {
+    btns[chosen].classList.add("no");
+    btns[correctPos].classList.add("ok");
+    fb.style.cssText="font-size:11px;padding:.4rem .7rem;border-radius:7px;margin-top:.4rem;display:block;line-height:1.4;background:rgba(200,70,70,.08);color:#d08080";
+    fb.textContent="😅 Errou! A certa está em verde. "+q.ex;
+    sfxErr();
+    bossSpeech("ERROU! O erro alimenta minha escuridão! Tome isso! 🔥");
+    bossLoseLife(()=>{
+      if(globalLives>0 && bossHP>0) setTimeout(()=>loadBossQ(),1200);
+    });
+  }
+}
+
+function bossLoseLife(cb){
+  const idx=bossLives-1;
+  const hEl=document.getElementById(`bh${idx}`);
+  if(hEl){hEl.classList.add("losing");setTimeout(()=>{hEl.classList.add("gone");hEl.textContent="🖤";},600);}
+  bossLives--;globalLives=bossLives;
+  beep(100,.3,"sawtooth",.2);beep(80,.3,"sawtooth",.18,.12);
+
+  // flash vermelho
+  const flash=document.createElement("div");
+  flash.style.cssText="position:fixed;inset:0;background:rgba(200,0,0,.22);z-index:9999;pointer-events:none";
+  document.body.appendChild(flash);
+  setTimeout(()=>flash.remove(),500);
+
+  if(bossLives<=0){
+    setTimeout(()=>{
+      sfxDead();
+      document.getElementById("dead-sub").innerHTML=`<span style="color:#d08080;font-weight:700">${pIc} ${pName}</span> — o vilão arrancou todo o seu saber... As trevas venceram desta vez. Mas o conhecimento nunca desaparece para sempre!`;
+      document.getElementById("dead-score").textContent=`Elementos recuperados: 5 / 5  ·  Acertos: ${totalOk} de ${ELEMS.length*QS}`;
+      show("dead-screen");
+      speak("O vilão venceu. Mas não desista! O conhecimento nunca some para sempre.");
+    },900);
+    return;
+  }
+  setTimeout(()=>cb&&cb(),700);
+}
+
+function bossVictory(){
+  stopBossTimer();
+  sfxVic();
+  const t=BOSS_TAUNT_DIE[Math.floor(Math.random()*BOSS_TAUNT_DIE.length)];
+  bossSpeech(t);
+  speakEvil(t);
+  // atualiza HP para 0 visualmente
+  bossHP=0;updateBossHP();
+  // aguarda a fala do boss terminar, depois inicia a sequência de rachadura
+  setTimeout(()=>startCrackSequence(),2800);
+}
+
+// ─── SEQUÊNCIA DE RACHADURA DA TELA ─────────────────────────────────
+function startCrackSequence(){
+  const ov=document.getElementById("crack-overlay");
+  const svg=document.getElementById("crack-svg-el");
+  ov.style.display="block";
+  ov.style.background="transparent";
+
+  // Linhas de rachadura irradiando do centro
+  const cracks=[
+    // centro para cantos e bordas
+    [[300,300],[120,80]],
+    [[300,300],[480,60]],
+    [[300,300],[600,250]],
+    [[300,300],[550,500]],
+    [[300,300],[350,600]],
+    [[300,300],[150,580]],
+    [[300,300],[0,350]],
+    [[300,300],[50,100]],
+    // ramificações secundárias
+    [[200,180],[80,20]],
+    [[200,180],[260,0]],
+    [[450,180],[560,30]],
+    [[450,180],[600,180]],
+    [[520,380],[600,320]],
+    [[520,380],[570,480]],
+    [[150,430],[0,480]],
+    [[150,430],[100,580]],
+    [[300,500],[280,600]],
+    [[300,500],[400,590]],
+  ];
+
+  let delay=0;
+  cracks.forEach((pts,i)=>{
+    setTimeout(()=>{
+      const line=document.createElementNS("http://www.w3.org/2000/svg","polyline");
+      const pointsStr=pts.map(p=>p.join(",")).join(" ");
+      line.setAttribute("points",pointsStr);
+      line.setAttribute("class","crack-line");
+      line.style.animationDelay="0s";
+      svg.appendChild(line);
+      // som de vidro a cada rachadura
+      if(i<4){beep(1800-(i*200),.06,"square",.08);}
+    },delay);
+    delay+=i<4?120:60;
+  });
+
+  // Estrondo e escurecimento
+  setTimeout(()=>{
+    // estrondo
+    beep(80,.35,"sawtooth",.35);beep(60,.35,"sawtooth",.28,.05);beep(40,.5,"sawtooth",.2,.1);
+    // cobre tudo de preto
+    ov.style.transition="background 0.6s ease";
+    ov.style.background="rgba(0,0,0,1)";
+  },delay+200);
+
+  // Após escurecer, transição para azul claro e cena do Velho Sábio
+  setTimeout(()=>{
+    // remove o overlay de rachaduras
+    ov.style.display="none";
+    svg.innerHTML="";
+    // mostra a tela do sábio (que tem fundo azul claro)
+    startSageScene();
+  },delay+1400);
+}
+
+// ─── CENA DO VELHO SÁBIO ────────────────────────────────────────────
+const SAGE_STEPS=[
+  n=>`${n}... Eu sabia que você conseguiria.`,
+  n=>`Meu nome não importa agora. Chame-me de Velho Sábio. Eu observei cada passo da sua jornada.`,
+  n=>`Aquele que você derrotou... ele era poderoso. Mas não era mau desde sempre. Ele foi... o meu antigo aluno.`,
+  n=>`Eu o chamava de <strong>Tiozão</strong>. Viajamos juntos por muitos anos, aprendendo os segredos do saber. Mas um dia... ele quis guardar o conhecimento só para si.`,
+  n=>`Pensei que havia falhado com ele. Mas então... você apareceu, ${n}. E provou que o saber pertence a todos.`,
+  n=>`Ele não era mau — apenas se perdeu. E hoje, graças a você, os <strong>5 Elementos do Saber</strong> voltam ao mundo. Obrigado, ${n}. De verdade.`,
+];
+
+let sageStep=0;
+let sageCurText="";
+let sageTyping=null;
+
+function makeSageClouds(){
+  const c=document.getElementById("sage-clouds");c.innerHTML="";
+  const sizes=[[200,80],[140,60],[180,70],[120,50],[220,65]];
+  const positions=[["-5%","15%"],["60%","8%"],["30%","25%"],["75%","40%"],["-2%","55%"]];
+  sizes.forEach(([w,h],i)=>{
+    const cl=document.createElement("div");cl.className="sage-cloud";
+    const [l,t]=positions[i];
+    cl.style.cssText=`width:${w}px;height:${h}px;left:${l};top:${t};--cd:${(15+i*3)}s;--cdl:-${i*2}s`;
+    c.appendChild(cl);
+  });
+}
+
+function startSageScene(){
+  sageStep=0;
+  makeSageClouds();
+  document.getElementById("sage-prof").innerHTML=
+    `<div class="prof-strip" style="border-color:rgba(58,138,176,.3);background:rgba(58,138,176,.07)"><div class="pav">${pIc}</div><div><div class="pname" style="color:#1a4a60">${pName}</div><div class="pclass" style="color:#4a8aaa">${pAv} — 5º ano</div></div></div>`;
+  show("sage-screen");
+  // pequena pausa antes de começar a falar
+  setTimeout(()=>renderSageStep(),600);
+}
+
+function renderSageStep(){
+  const fn=SAGE_STEPS[sageStep];
+  if(!fn)return;
+  const rawHTML=fn(pName);
+  const plain=rawHTML.replace(/<[^>]+>/g,"");
+  sageCurText=plain;
+
+  const txtEl=document.getElementById("sage-txt");
+  txtEl.innerHTML="";
+  const hint=document.getElementById("sage-hint");
+  hint.classList.add("off");
+
+  let i=0;
+  if(sageTyping)clearInterval(sageTyping);
+  sageTyping=setInterval(()=>{
+    i++;
+    // trimHTML está definida no escopo global (usada no vilão)
+    txtEl.innerHTML=trimHTML(rawHTML,i)+'<span class="cur"></span>';
+    if(i>=plain.length){
+      clearInterval(sageTyping);
+      txtEl.innerHTML=rawHTML;
+      speak(plain);
+      setTimeout(()=>{
+        if(sageStep<SAGE_STEPS.length-1){
+          hint.textContent="[ toque para continuar ]";
+          hint.classList.remove("off");
+          hint.onclick=nextSageStep;
+        } else {
+          // último passo — mostra botão de vitória
+          hint.textContent="✦ Ver resultado final ✦";
+          hint.classList.remove("off");
+          hint.style.color="rgba(58,138,176,.9)";
+          hint.onclick=()=>showTrueVic(true);
+        }
+      },500);
+    }
+  },42);
+}
+
+function nextSageStep(){
+  sfxClick();
+  sageStep++;
+  renderSageStep();
+}
+
+function speakSage(){speak(sageCurText);}
+
+// ─── VITÓRIA REAL ─────────────────────────────────────────────────────
+function showTrueVic(fought){
+  sfxVic();
+  const msg = fought
+    ? `${pIc} <strong>${pName}</strong> resistiu às trevas, protegeu o saber e venceu o vilão! O conhecimento pertence ao mundo!`
+    : `${pIc} <strong>${pName}</strong>, ${pAv} incrível — recuperou todos os 5 Elementos e salvou o saber do mundo!`;
+  document.getElementById("vic-sub").innerHTML=msg;
+  document.getElementById("vic-inv").innerHTML=inventory.map(i=>`<span title="${i.name}">${i.icon}</span>`).join('');
+  document.getElementById("vic-score").textContent=`Vidas restantes: ${globalLives} ❤️  ·  Acertos: ${totalOk} de ${ELEMS.length*QS}`;
+  show("vic-screen");
+  speak(`Parabéns, ${pName}! Você é incrível! O saber foi protegido!`);
+}
+
+// ─── REINICIAR ───────────────────────────────────────────────────────
+function restart(){
+  sfxClick();
+  if(window.speechSynthesis)speechSynthesis.cancel();
+  stopBossTimer();
+  pName="";pAv="";pIc="";recovered={};inventory=[];totalOk=0;globalLives=MAX_LIVES;
+  curQ=0;narStep=0;errosFase=0;answered=false;faseQs=[];
+  bossHP=5;bossLives=0;bossStep=0;bossHalfTaunted=false;
+  bossCurQIdx=-1;bossSkillBurnedIdx=new Set();
+  sageStep=0;sageCurText="";
+  ['port','mat','cie','hist','geo'].forEach(k=>{BOSS_COMBO[k]=0;BOSS_SKILL_USED[k]=false;BOSS_SKILL_UNLOCKED[k]=false;});
+  document.getElementById("inp-name").value="";
+  document.querySelectorAll(".av-card").forEach(c=>c.classList.remove("sel"));
+  const ov=document.getElementById("rwOv");if(ov)ov.remove();
+  show("name-screen");
+}
+
+// ─── INTRO NARRAÇÃO ──────────────────────────────────────────────────
+const NARS=[
+  ()=>`Psiu... ${pName}! Você foi escolhido para uma missão muito importante!`,
+  ()=>`Os 5 Elementos do Saber foram roubados por um vilão que quer apagar todo o conhecimento!`,
+  ()=>`Você tem ${MAX_LIVES} vidas para completar a jornada. Cada erro consome uma vida global!`,
+  ()=>`Cada elemento tem 5 questões embaralhadas. Pode errar apenas 1 por elemento!`,
+  ()=>`Atenção: passe uma fase sem errar nenhuma questão e ganhe 1 vida extra!`,
+  ()=>`Vamos lá, ${pIc} ${pName}! A cada elemento recuperado você ganha um item especial!`
+];
+
+let tyT=null;
+function typeNar(){
+  const el=document.getElementById("nar-txt"),hint=document.getElementById("cnt-hint");
+  hint.classList.add("off");
+  const txt=NARS[narStep]();curNarText=txt;
+  el.innerHTML="";let i=0;if(tyT)clearInterval(tyT);
+  tyT=setInterval(()=>{
+    i++;el.innerHTML=txt.slice(0,i)+'<span class="cur"></span>';
+    if(i>=txt.length){clearInterval(tyT);el.innerHTML=txt;setTimeout(()=>hint.classList.remove("off"),400);speak(txt);}
+  },38);
+}
+function nextNar(){sfxClick();narStep++;if(narStep<NARS.length)typeNar();else{buildMap();show("map-screen");}}
+function skipIntro(){
+  sfxClick();
+  if(window.speechSynthesis)speechSynthesis.cancel();
+  if(tyT)clearInterval(tyT);
+  buildMap();show("map-screen");
+}
+function skipVillain(){
+  sfxClick();
+  if(window.speechSynthesis)speechSynthesis.cancel();
+  if(villTyping)clearInterval(villTyping);
+  const dreadEl=document.getElementById("vill-dread");if(dreadEl)dreadEl.remove();
+  startBoss();
+}
+function skipSage(){
+  sfxClick();
+  if(window.speechSynthesis)speechSynthesis.cancel();
+  if(sageTyping)clearInterval(sageTyping);
+  showTrueVic(true);
+}
+
+// ─── EVENTOS ─────────────────────────────────────────────────────────
+document.getElementById("btn-av").onclick=()=>{
+  sfxClick();
+  const n=document.getElementById("inp-name").value.trim();
+  if(!n){document.getElementById("inp-name").focus();return;}
+  pName=n;show("avatar-screen");
+};
+document.getElementById("inp-name").addEventListener("keydown",e=>{if(e.key==="Enter")document.getElementById("btn-av").click();});
+
+document.querySelectorAll(".av-card").forEach(c=>{
+  c.onclick=function(){
+    sfxClick();
+    document.querySelectorAll(".av-card").forEach(x=>x.classList.remove("sel"));
+    this.classList.add("sel");pAv=this.dataset.av;
+    const map={"Detetive":"🔍","Cientista":"🧪","Explorador":"🌎","Artista":"🎨","Inventor":"💡","Leitor":"📚"};
+    pIc=map[pAv]||"⭐";
+  };
 });
 
-// Fallback: se demorar 4s sem conectar, mantém guia visível
-setTimeout(() => {
-    if (!_fbReady) {
-        document.getElementById("setup-guide").style.display = "block";
-    }
-}, 4000);
-
-// ═══════════════════════════════════════════════════════════════
-//  HELPERS FIREBASE
-// ═══════════════════════════════════════════════════════════════
-function fbRef(path)        { return window._fb.ref(path); }
-function fbSet(path, val)   { return window._fb.set(fbRef(path), val); }
-function fbGet(path)        { return window._fb.get(fbRef(path)); }
-function fbUpdate(path, val){ return window._fb.update(fbRef(path), val); }
-function fbRemove(path)     { return window._fb.remove(fbRef(path)); }
-function fbListen(path, cb) {
-    const r = fbRef(path);
-    window._fb.onValue(r, snap => cb(snap.val()));
-    return () => window._fb.onValue(r, () => {}, { onlyOnce: false });
-}
-
-// Atalho: pega jogadores
-async function getPlayers() {
-    const snap = await fbGet("quiz/players");
-    return snap.val() || {};
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  TELAS
-// ═══════════════════════════════════════════════════════════════
-function showScreen(id) {
-    ["screen-login","screen-lobby","screen-admin","screen-game","screen-end"].forEach(s =>
-        document.getElementById(s).classList.add("hidden")
-    );
-    document.getElementById(id).classList.remove("hidden");
-}
-
-function selectAvatar(el, av) {
-    document.querySelectorAll(".avatar-option").forEach(o => o.classList.remove("selected"));
-    el.classList.add("selected");
-    myAvatar = av;
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  ANTI-CHEAT (bloqueio de navegação)
-// ═══════════════════════════════════════════════════════════════
-function blockNavKeys(e) {
-    if (e.key === "F5") { e.preventDefault(); e.stopImmediatePropagation(); return false; }
-    if ((e.ctrlKey||e.metaKey) && (e.key==="r"||e.key==="R")) { e.preventDefault(); e.stopImmediatePropagation(); return false; }
-    if (e.key === "Backspace" && e.target.tagName!=="INPUT" && e.target.tagName!=="TEXTAREA" && !e.target.isContentEditable) { e.preventDefault(); e.stopImmediatePropagation(); return false; }
-    if (e.altKey && (e.key==="ArrowLeft"||e.key==="ArrowRight")) { e.preventDefault(); e.stopImmediatePropagation(); return false; }
-}
-
-function blindHistory() {
-    for (let i = 0; i < 50; i++) window.history.pushState({ blocked:true }, "", window.location.href);
-}
-
-(function initGlobalBlock() {
-    document.addEventListener("keydown", blockNavKeys, true);
-    window.addEventListener("beforeunload", e => { e.preventDefault(); e.returnValue = ""; return ""; });
-    blindHistory();
-    window.addEventListener("popstate", blindHistory);
-    setInterval(() => { if (window.history.length < 10) blindHistory(); }, 3000);
-})();
-
-// ═══════════════════════════════════════════════════════════════
-//  ENTRAR NA SALA (ALUNO)
-// ═══════════════════════════════════════════════════════════════
-async function enterLobby() {
-    if (!_fbReady) { alert("Aguarde o Firebase carregar..."); return; }
-    let name = document.getElementById("player-name").value.trim();
-    if (!name) { alert("Por favor, digite seu nome!"); return; }
-    myName = name;
-
-    await fbSet("quiz/players/" + myId, {
-        name: myName, avatar: myAvatar,
-        score: 0, currentPhase: 0, answered: false
-    });
-
-    showScreen("screen-lobby");
-    startStudentSync();
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  SYNC ALUNO — escuta Firebase em tempo real
-// ═══════════════════════════════════════════════════════════════
-function startStudentSync() {
-    // Lista de colegas na sala
-    window._fb.onValue(fbRef("quiz/players"), snap => {
-        let players = snap.val() || {};
-        let html = Object.values(players).map(p =>
-            `<div class="player-item">${p.avatar} <b>${p.name}</b> — ${p.score} pts ${p.answered?"✅":"⏳"}</div>`
-        ).join("") || "<p style='color:#aaa'>Ninguém ainda...</p>";
-        let el = document.getElementById("lobby-players-list");
-        if (el) el.innerHTML = html;
-    });
-
-    // Estado da sala
-    window._fb.onValue(fbRef("quiz/room"), snap => {
-        let room = snap.val() || {};
-        let state = room.state || "idle";
-        let serverIdx = room.currentIndex ?? 0;
-
-        if (state === "playing") {
-            // Nova fase
-            if (serverIdx !== currentQuestionIndex) {
-                _resultadoMostrado = false;
-                document.getElementById("screen-locked").classList.add("hidden");
-                loadPhase(serverIdx);
-            }
-            // Professor revelou a resposta?
-            if (room.revealed === serverIdx && !_resultadoMostrado) {
-                _resultadoMostrado = true;
-                getPlayers().then(p => mostrarResultadoAluno(p, serverIdx));
-            }
-        }
-
-        if (state === "finished") {
-            showScreen("screen-end");
-            getPlayers().then(p => {
-                initPodio(p);
-                document.getElementById("podio-controls").style.display = "none";
-                showFullTable();
-            });
-        }
-    });
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  CARREGAR FASE (ALUNO)
-// ═══════════════════════════════════════════════════════════════
-function loadPhase(idx) {
-    currentQuestionIndex = idx;
-    if (idx >= questions.length) return;
-    showScreen("screen-game");
-
-    fbUpdate("quiz/players/" + myId, { answered: false, currentPhase: idx });
-
-    clearInterval(timerInterval);
-    timeLeft = 60;
-    document.getElementById("time-left").innerText = timeLeft;
-    document.getElementById("my-score-display").innerText = myScore;
-
-    let q = questions[idx];
-    document.getElementById("current-phase").innerText = q.phase;
-    document.getElementById("question-text").innerText = "[" + q.subject + "] " + q.question;
-    document.getElementById("mascot").innerText = "🐺";
-    document.getElementById("mascot-speech").innerText = "Valendo pontos por velocidade em " + q.subject + "!";
-
-    let box = document.getElementById("options-container");
-    box.innerHTML = "";
-    q.options.forEach(opt => {
-        let btn = document.createElement("button");
-        btn.className = "option-btn";
-        btn.innerText = opt;
-        btn.onclick = () => submitAnswer(opt, q.answer, q.options, btn);
-        box.appendChild(btn);
-    });
-
-    timerInterval = setInterval(() => {
-        timeLeft--;
-        document.getElementById("time-left").innerText = timeLeft;
-        if (timeLeft <= 10) {
-            document.getElementById("mascot").innerText = "🧐";
-            document.getElementById("mascot-speech").innerText = "O tempo está acabando!";
-        }
-        if (timeLeft <= 0) { clearInterval(timerInterval); submitAnswer("", q.answer, q.options, null); }
-    }, 1000);
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  SUBMETER RESPOSTA
-// ═══════════════════════════════════════════════════════════════
-async function submitAnswer(selected, correct, allOptions, clickedBtn) {
-    clearInterval(timerInterval);
-
-    document.querySelectorAll(".option-btn").forEach(b => {
-        b.disabled = true;
-        if (b === clickedBtn) b.classList.add("selected-answer");
-    });
-
-    let points = (selected === correct) ? timeLeft * 10 : 0;
-    myScore += points;
-    myLastSelected = selected;
-    myLastCorrect  = correct;
-    myLastPoints   = points;
-
-    document.getElementById("my-score-display").innerText = myScore;
-
-    // Atualiza dados do jogador no Firebase
-    await fbUpdate("quiz/players/" + myId, {
-        score: myScore, answered: true, lastSelected: selected
-    });
-
-    // Conta escolhas por alternativa
-    if (selected) {
-        let idx = currentQuestionIndex;
-        let countSnap = await fbGet("quiz/counts/" + idx + "/" + selected.replace(/\s+/g,"_"));
-        let cur = countSnap.val() || 0;
-        await fbSet("quiz/counts/" + idx + "/" + selected.replace(/\s+/g,"_"), cur + 1);
-    }
-
-    setTimeout(() => {
-        document.getElementById("lock-spinner").style.display = "block";
-        document.getElementById("lock-title").innerText  = "Resposta Enviada!";
-        document.getElementById("lock-subtitle").innerText = "Aguarde o professor revelar a resposta...";
-        document.getElementById("lock-result-area").innerHTML = "";
-        document.getElementById("screen-locked").classList.remove("hidden");
-    }, 400);
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  RESULTADO NA LOCK SCREEN
-// ═══════════════════════════════════════════════════════════════
-function mostrarResultadoAluno(players, serverIdx) {
-    let resultArea = document.getElementById("lock-result-area");
-    if (!resultArea) return;
-    document.getElementById("lock-spinner").style.display = "none";
-
-    let acertou = myLastSelected === myLastCorrect;
-    let tempoEsgotado = !myLastSelected;
-
-    const msgsAcerto = ["Você mandou bem! Continue assim! 🚀","Incrível! Você conhece essa matéria! 📚","Isso aí! Resposta certinha! ✨","Que mente afiada! Arrasou! 🧠","Perfeito! Você está no caminho certo! 🏆"];
-    const msgsErro   = ["Não desanime! Você vai aprender com isso! 💪","Quase! Fique ligado na próxima! 😊","Errando também se aprende! Vai na próxima! 📖","Não foi dessa vez, mas você consegue! 🌟","Cada erro é uma lição! Segura a emoção! 🎯"];
-    const msgsTempo  = ["Ops! O tempo acabou! Na próxima seja mais rápido! ⏰","Tempo esgotado! Confia mais em você! ⚡"];
-
-    let msg, emoji, cls, ptsTxt;
-    if (tempoEsgotado) {
-        msg = msgsTempo[Math.floor(Math.random()*msgsTempo.length)]; emoji="⌛"; cls="tempo"; ptsTxt="";
-    } else if (acertou) {
-        msg = msgsAcerto[Math.floor(Math.random()*msgsAcerto.length)];
-        emoji = ["🎉","🥳","🌟","🏅","💥"][Math.floor(Math.random()*5)]; cls="acertou";
-        ptsTxt = `<span class="lock-pts-gained">+${myLastPoints} pontos ⭐</span>`;
-    } else {
-        msg = msgsErro[Math.floor(Math.random()*msgsErro.length)];
-        emoji = ["😅","🤔","💡","📝","🙏"][Math.floor(Math.random()*5)]; cls="errou"; ptsTxt="";
-    }
-
-    let sorted = Object.values(players).sort((a,b) => b.score - a.score);
-    let pos = sorted.findIndex(p => p.name === myName) + 1;
-    let medals = {1:"🥇",2:"🥈",3:"🥉"};
-    let posStr = (medals[pos]||"") + " " + pos + "º lugar";
-
-    resultArea.innerHTML = `
-        <div class="lock-result-box ${cls}">
-            <span class="lock-result-emoji">${emoji}</span>
-            <div>${acertou?"ACERTOU!":tempoEsgotado?"TEMPO ESGOTADO":"ERROU!"}</div>
-            <div class="lock-result-msg">${msg}</div>
-            ${ptsTxt}
-            <div class="lock-ranking-box">
-                <div class="lock-ranking-pos">${posStr}</div>
-                <div style="font-size:.85rem;font-weight:normal;margin-top:2px;">de ${sorted.length} participantes • ${myScore} pts total</div>
-            </div>
-        </div>`;
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  PROFESSOR — autenticação e sync
-// ═══════════════════════════════════════════════════════════════
-function openAdminAuth() {
-    if (!_fbReady) { alert("Aguarde o Firebase carregar..."); return; }
-    let pass = prompt("Digite a senha do administrador:");
-    if (pass === "123456") {
-        isAdmin = true;
-        showScreen("screen-admin");
-        startAdminSync();
-    } else {
-        alert("Senha incorreta!");
-    }
-}
-
-function startAdminSync() {
-    window._fb.onValue(fbRef("quiz/players"), snap => {
-        let players = snap.val() || {};
-        let vals = Object.values(players);
-        let total = vals.length, answered = vals.filter(p=>p.answered).length;
-
-        let html = vals.map(p =>
-            `<div class="player-item">${p.avatar} <b>${p.name}</b> — Fase ${(p.currentPhase||0)+1} — ${p.score} pts ${p.answered?"✅":"⏳"}</div>`
-        ).join("") || "<p style='color:#aaa'>Nenhum aluno ainda...</p>";
-
-        let ll = document.getElementById("admin-players-list-lobby");
-        if (ll) ll.innerHTML = html;
-        let gl = document.getElementById("admin-players-list-game");
-        if (gl) gl.innerHTML = html;
-
-        let ie = document.getElementById("admin-answered-info");
-        if (ie) ie.innerText = total > 0 ? answered + " de " + total + " alunos responderam" : "";
-
-        buildScoreboard(players, "admin-scoreboard");
-    });
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  PROFESSOR — iniciar jogo
-// ═══════════════════════════════════════════════════════════════
-async function startGame() {
-    let players = await getPlayers();
-    if (Object.keys(players).length === 0) { alert("Nenhum aluno entrou na sala ainda!"); return; }
-    await fbUpdate("quiz/room", { state:"playing", currentIndex:0, revealed:-1 });
-    document.getElementById("admin-lobby-view").classList.add("hidden");
-    document.getElementById("admin-game-view").classList.remove("hidden");
-    adminLoadQuestion(0);
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  PROFESSOR — carregar questão
-// ═══════════════════════════════════════════════════════════════
-async function adminLoadQuestion(idx) {
-    if (idx >= questions.length) { adminEndGame(); return; }
-    let q = questions[idx];
-    let pct = Math.round(((idx+1)/questions.length)*100);
-
-    document.getElementById("admin-phase-badge").textContent = "Fase " + q.phase + " — " + q.subject;
-    document.getElementById("admin-phase-badge").className   = "phase-badge " + subjectBadgeClass[q.subject];
-    document.getElementById("admin-progress").style.width    = pct + "%";
-    document.getElementById("admin-phase-label").textContent = "Fase " + q.phase + " de " + questions.length;
-    document.getElementById("admin-question-text").textContent = q.question;
-    document.getElementById("admin-answer-box").classList.add("hidden");
-    document.getElementById("btn-reveal-admin").disabled     = false;
-    document.getElementById("btn-next-admin").style.display  = "none";
-
-    let old = document.getElementById("pct-wrap-admin");
-    if (old) old.remove();
-
-    let ul = document.getElementById("admin-options-list");
-    ul.innerHTML = q.options.map(o => `<li id="adm-opt-${o.replace(/\s+/g,'_')}">${o}</li>`).join("");
-
-    // Reseta respondidos no Firebase
-    let players = await getPlayers();
-    let updates = {};
-    Object.keys(players).forEach(k => { updates["quiz/players/" + k + "/answered"] = false; });
-    updates["quiz/room/currentIndex"] = idx;
-    updates["quiz/room/revealed"]     = -1;
-    await fbUpdate("/", updates);
-
-    if (!_muteAdminVoz) lerPergunta(q);
-
-    clearInterval(adminTimerInterval);
-    adminTimerVal = 60;
-    document.getElementById("admin-timer").textContent      = adminTimerVal;
-    document.getElementById("admin-timer-bar").style.width  = "100%";
-    adminTimerInterval = setInterval(() => {
-        adminTimerVal--;
-        document.getElementById("admin-timer").textContent     = adminTimerVal;
-        document.getElementById("admin-timer-bar").style.width = Math.round((adminTimerVal/60)*100) + "%";
-        if (adminTimerVal <= 0) clearInterval(adminTimerInterval);
-    }, 1000);
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  PROFESSOR — revelar resposta
-// ═══════════════════════════════════════════════════════════════
-async function adminRevealAnswer() {
-    clearInterval(adminTimerInterval);
-    let roomSnap = await fbGet("quiz/room");
-    let room = roomSnap.val() || {};
-    let idx = room.currentIndex ?? 0;
-    let q   = questions[idx];
-
-    // Sinaliza para alunos
-    await fbUpdate("quiz/room", { revealed: idx });
-
-    // Destaca resposta correta
-    let key = q.answer.replace(/\s+/g,"_");
-    let li  = document.getElementById("adm-opt-" + key);
-    if (li) li.classList.add("correct");
-
-    document.getElementById("admin-answer-text").textContent = q.answer;
-    document.getElementById("admin-answer-box").classList.remove("hidden");
-    document.getElementById("btn-reveal-admin").disabled    = true;
-    document.getElementById("btn-next-admin").style.display = "inline-block";
-
-    mostrarPorcentagens(idx, q);
-    if (!_muteAdminVoz) lerResposta(q.answer);
-}
-
-async function mostrarPorcentagens(idx, q) {
-    let snap   = await fbGet("quiz/counts/" + idx);
-    let counts = snap.val() || {};
-    let total  = Object.values(counts).reduce((s,v) => s+v, 0) || 1;
-
-    let html = "<div class='pct-bar-wrap'>";
-    q.options.forEach(opt => {
-        let key = opt.replace(/\s+/g,"_");
-        let n   = counts[key] || 0;
-        let pct = Math.round((n/total)*100);
-        let isCorrect = opt === q.answer;
-        html += `<div class='pct-bar-row'>
-            <span class='pct-bar-label' title='${opt}'>${opt}</span>
-            <div class='pct-bar-bg'><div class='pct-bar-fill ${isCorrect?"correct-bar":""}' style='width:${pct}%'></div></div>
-            <span class='pct-num'>${pct}%</span>
-        </div>`;
-    });
-    html += "</div>";
-
-    let ul  = document.getElementById("admin-options-list");
-    let old = document.getElementById("pct-wrap-admin");
-    if (old) old.remove();
-    let div = document.createElement("div");
-    div.id = "pct-wrap-admin";
-    div.innerHTML = html;
-    ul.after(div);
-}
-
-function adminNextPhase() {
-    fbGet("quiz/room").then(snap => {
-        let idx = (snap.val() || {}).currentIndex ?? 0;
-        adminLoadQuestion(idx + 1);
-        adminTab("tab-q", document.querySelector(".nav-tab"));
-    });
-}
-
-function adminTab(tabId, btn) {
-    ["tab-q","tab-score","tab-players"].forEach(t => document.getElementById(t).classList.add("hidden"));
-    document.getElementById(tabId).classList.remove("hidden");
-    document.querySelectorAll(".nav-tab").forEach(t => t.classList.remove("active"));
-    btn.classList.add("active");
-}
-
-async function adminEndGame() {
-    clearInterval(adminTimerInterval);
-    await fbUpdate("quiz/room", { state:"finished" });
-    let players = await getPlayers();
-    showScreen("screen-end");
-    initPodio(players);
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  PÓDIO E FIM
-// ═══════════════════════════════════════════════════════════════
-function buildScoreboard(players, elementId) {
-    let el = document.getElementById(elementId);
-    if (!el) return;
-    let sorted = Object.values(players).sort((a,b) => b.score-a.score);
-    if (!sorted.length) { el.innerHTML = "<p style='color:#aaa;text-align:center'>Nenhum jogador.</p>"; return; }
-    let medals = ["🥇","🥈","🥉"];
-    el.innerHTML = sorted.map((p,i) =>
-        `<div class="score-rank">${medals[i]||(i+1)+"°"} ${p.avatar} <b>${p.name}</b> <span style="margin-left:auto;color:#555;">${p.score} pts</span></div>`
-    ).join("");
-}
-
-function initPodio(players) {
-    _podioSorted = Object.values(players).sort((a,b) => b.score-a.score);
-    function fill(rank, idx) {
-        let p = _podioSorted[idx];
-        if (!p) return;
-        document.getElementById("av-"+rank).innerText = p.avatar;
-        document.getElementById("nm-"+rank).innerText = p.name;
-        document.getElementById("pt-"+rank).innerText = p.score + " pontos";
-    }
-    fill(1,0); fill(2,1); fill(3,2);
-}
-
-function showPodio(rank) {
-    let stepEl = document.getElementById("step-"+rank);
-    let cardEl = document.getElementById("card-"+rank);
-    stepEl.style.display = "block";
-    document.getElementById("btn-show"+rank).disabled = true;
-    setTimeout(() => {
-        stepEl.querySelector(".dots-anim").style.display = "none";
-        cardEl.classList.add("active");
-        if (rank === 1) {
-            setTimeout(iniciarSuspense1, 400);
-        } else {
-            let next = rank - 1;
-            let nb = document.getElementById("btn-show"+next);
-            if (nb) { nb.style.display="inline-block"; setTimeout(()=>{ nb.disabled=false; },300); }
-        }
-    }, 2200);
-}
-
-function showFullTable() {
-    document.getElementById("podio-controls").style.display = "none";
-    let tableDiv = document.getElementById("full-table");
-    tableDiv.style.display = "block";
-    let rowsDiv = document.getElementById("full-table-rows");
-    let cls = ["gold","silver","bronze"];
-    let medals = ["🥇","🥈","🥉"];
-    rowsDiv.innerHTML = _podioSorted.map((p,i) =>
-        `<div class="table-row ${cls[i]||''}">
-            <span class="table-pos">${medals[i]||(i+1)+"°"}</span>
-            <span class="table-av">${p.avatar}</span>
-            <span class="table-name">${p.name}</span>
-            <span class="table-pts">${p.score} pontos</span>
-        </div>`
-    ).join("");
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  SUSPENSE 1º LUGAR
-// ═══════════════════════════════════════════════════════════════
-function tocarTambor(vezes, intervalo, onFim) {
-    let AudioCtx = window.AudioContext || window.webkitAudioContext;
-    if (!AudioCtx) { if(onFim) onFim(); return; }
-    let ctx = new AudioCtx();
-    function batida(t) {
-        let osc = ctx.createOscillator(), gain = ctx.createGain();
-        osc.connect(gain); gain.connect(ctx.destination);
-        osc.type="sine"; osc.frequency.setValueAtTime(150,t); osc.frequency.exponentialRampToValueAtTime(40,t+0.3);
-        gain.gain.setValueAtTime(1,t); gain.gain.exponentialRampToValueAtTime(0.001,t+0.35);
-        osc.start(t); osc.stop(t+0.35);
-        let bufSize=ctx.sampleRate*0.12, buf=ctx.createBuffer(1,bufSize,ctx.sampleRate);
-        let data=buf.getChannelData(0); for(let i=0;i<bufSize;i++) data[i]=(Math.random()*2-1);
-        let src=ctx.createBufferSource(), filt=ctx.createBiquadFilter(), gn=ctx.createGain();
-        src.buffer=buf; filt.type="bandpass"; filt.frequency.value=2000; filt.Q.value=0.8;
-        src.connect(filt); filt.connect(gn); gn.connect(ctx.destination);
-        gn.gain.setValueAtTime(0.6,t); gn.gain.exponentialRampToValueAtTime(0.001,t+0.12);
-        src.start(t); src.stop(t+0.12);
-    }
-    let now=ctx.currentTime+0.05, t=0, iv=intervalo/1000;
-    for(let i=0;i<vezes;i++) { batida(now+t); t+=iv*(1-(i/vezes)*0.55); }
-    if(onFim) setTimeout(onFim, t*1000+200);
-}
-
-function iniciarSuspense1() {
-    let p = _podioSorted[0]; if(!p) return;
-    document.getElementById("reveal-av-big").innerText = p.avatar;
-    document.getElementById("reveal-nm-big").innerText = p.name;
-    document.getElementById("reveal-pt-big").innerText = p.score+" pontos";
-    let ov = document.getElementById("suspense-overlay");
-    ov.classList.add("ativo");
-    document.getElementById("suspense-fase-1").style.display = "block";
-    document.getElementById("reveal-nome-1").classList.remove("visivel");
-    document.getElementById("btn-fechar-suspense").style.display = "none";
-    tocarTambor(22, 320, () => {
-        document.getElementById("suspense-fase-1").style.display="none";
-        document.getElementById("reveal-nome-1").classList.add("visivel");
-        launchConfetti();
-        setTimeout(()=>{ document.getElementById("btn-fechar-suspense").style.display="inline-block"; }, 1500);
-    });
-}
-
-function fecharSuspense() {
-    document.getElementById("suspense-overlay").classList.remove("ativo");
-    document.getElementById("parabens-nome").innerText = _podioSorted[0]?.name||"";
-    document.getElementById("parabens-box").style.display="block";
-    document.getElementById("btn-showall").style.display="inline-block";
-    launchConfetti();
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  CONFETE
-// ═══════════════════════════════════════════════════════════════
-function launchConfetti() {
-    let canvas=document.getElementById("confetti-canvas"); if(!canvas) return;
-    let ctx=canvas.getContext("2d");
-    canvas.width=window.innerWidth; canvas.height=window.innerHeight;
-    let pieces=[], colors=["#ff4757","#ffa502","#2ed573","#1e90ff","#ff6b81","#eccc68","#a29bfe","#fd79a8","#00cec9","#fdcb6e"];
-    for(let i=0;i<180;i++) pieces.push({ x:Math.random()*canvas.width, y:Math.random()*-canvas.height, w:8+Math.random()*10, h:6+Math.random()*8, color:colors[Math.floor(Math.random()*colors.length)], rot:Math.random()*360, vx:(Math.random()-.5)*3, vy:2+Math.random()*4, vr:(Math.random()-.5)*6 });
-    let frame;
-    function draw() {
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        pieces.forEach(p => { ctx.save(); ctx.translate(p.x+p.w/2,p.y+p.h/2); ctx.rotate(p.rot*Math.PI/180); ctx.fillStyle=p.color; ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore(); p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr; });
-        pieces=pieces.filter(p=>p.y<canvas.height+20);
-        if(pieces.length>0) frame=requestAnimationFrame(draw); else ctx.clearRect(0,0,canvas.width,canvas.height);
-    }
-    draw();
-    [800,1600,2600].forEach(delay => setTimeout(()=>{
-        for(let i=0;i<80;i++) pieces.push({ x:Math.random()*canvas.width, y:-10, w:8+Math.random()*10, h:6+Math.random()*8, color:colors[Math.floor(Math.random()*colors.length)], rot:Math.random()*360, vx:(Math.random()-.5)*3, vy:2+Math.random()*4, vr:(Math.random()-.5)*6 });
-        if(!frame) draw();
-    }, delay));
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  RESETAR SALA
-// ═══════════════════════════════════════════════════════════════
-async function clearServer() {
-    clearInterval(timerInterval);
-    clearInterval(adminTimerInterval);
-    await fbRemove("quiz");
-    alert("Sala resetada com sucesso!");
-    location.reload();
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  SESSÃO ATIVA (recarregou a página?)
-// ═══════════════════════════════════════════════════════════════
-async function checkActiveSession() {
-    let snap = await fbGet("quiz/players/" + myId);
-    let me   = snap.val();
-    if (!me) return; // não estava na sala
-    myName   = me.name;
-    myAvatar = me.avatar;
-    myScore  = me.score;
-    let roomSnap = await fbGet("quiz/room");
-    let state = (roomSnap.val()||{}).state||"idle";
-    if (state === "playing") { showScreen("screen-game"); startStudentSync(); }
-    else if (state === "idle" || state === "waiting") { showScreen("screen-lobby"); startStudentSync(); }
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  VOZ (TTS) — exclusivo professor
-// ═══════════════════════════════════════════════════════════════
-let _ttsVoice = null;
-function initVoice() {
-    if (!window.speechSynthesis) return;
-    function pick() { let v=speechSynthesis.getVoices(); _ttsVoice=v.find(x=>x.lang==="pt-BR")||v.find(x=>x.lang.startsWith("pt"))||v[0]||null; }
-    pick(); speechSynthesis.onvoiceschanged = pick;
-}
-function falar(texto) {
-    if (!window.speechSynthesis) return;
-    speechSynthesis.cancel();
-    let u = new SpeechSynthesisUtterance(texto);
-    u.lang="pt-BR"; u.rate=0.95; u.pitch=1.0; u.volume=1;
-    if(_ttsVoice) u.voice=_ttsVoice;
-    speechSynthesis.speak(u);
-}
-function lerPergunta(q) {
-    let letras=["A.","B.","C.","D."];
-    let ops = q.options.map((o,i)=>letras[i]+" "+o).join(". ");
-    falar(q.subject+". "+q.question+". As alternativas são: "+ops+".");
-}
-function lerResposta(r) { falar("A resposta correta é: "+r+"!"); }
-function toggleMuteAdmin() {
-    _muteAdminVoz = !_muteAdminVoz;
-    let btn = document.getElementById("btn-mute-admin");
-    if(btn) btn.innerText = _muteAdminVoz ? "🔇 Som off" : "🔊 Som on";
-    if(_muteAdminVoz && window.speechSynthesis) speechSynthesis.cancel();
-}
+document.getElementById("btn-story").onclick=()=>{
+  sfxClick();if(!pAv)return;show("intro-screen");narStep=0;typeNar();
+};
+
+// ─── CALVIN0 — F9 pula a fase atual ──────────────────────────────────
+document.addEventListener("keydown",e=>{
+  if(e.key!=="F9")return;
+  if(pName!==CALVIN)return;
+  if(!curEl||recovered[curEl.id])return;
+  e.preventDefault();
+  sfxSkip();
+  if(window.speechSynthesis)speechSynthesis.cancel();
+  recovered[curEl.id]=true;
+  inventory.push({icon:curEl.reward.icon,name:curEl.reward.name});
+  showRewardPopup(curEl,false,()=>{buildMap();show("map-screen");});
+});
+
+// ─── INIT ─────────────────────────────────────────────────────────────
+makeStars();
 </script>
 </body>
 </html>
